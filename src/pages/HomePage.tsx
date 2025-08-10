@@ -159,7 +159,7 @@ function HomePage() {
       ) : (
         // Desktop view with side-by-side panels
         <div className="flex-1 grid grid-cols-3 gap-4 p-4">
-          <div className="col-span-2 h-[calc(100vh-120px)]">
+          <div className="col-span-2 h-[calc(100vh-100px)]">
             <MapView 
               onMarkerClick={handleAirfieldSelect}
               onFlightPathClick={handleFlightSelect}
@@ -167,7 +167,7 @@ function HomePage() {
               className="h-full shadow-sm"
             />
           </div>
-          <div className="col-span-1 h-[calc(100vh-120px)]">
+          <div className="col-span-1 h-[calc(100vh-100px)]">
             <Tabs defaultValue="airfields" className="h-full flex flex-col">
               <TabsList className="w-full grid grid-cols-2">
                 <TabsTrigger value="airfields" className="flex items-center gap-1">
@@ -217,24 +217,6 @@ function HomePage() {
           </div>
         </div>
       )}
-      
-      {/* Footer with home airfield info */}
-      <footer className="bg-muted/50 border-t p-3 text-sm text-muted-foreground">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-1">
-            <Home className="h-4 w-4" />
-            <span>Home Base: {homeAirfield ? `${homeAirfield.name} (${homeAirfield.icao})` : 'None set'}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <CircleHelp className="h-4 w-4" />
-            <span className="hidden sm:inline">
-              {selectedFlightPath 
-                ? `Showing flight: ${selectedFlightPath.name} (${selectedFlightPath.date})`
-                : 'Upload KML/GPX flight traces to visualize your flights'}
-            </span>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

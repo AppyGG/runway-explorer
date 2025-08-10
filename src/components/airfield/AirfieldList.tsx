@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAirfieldStore } from '@/store/airfield-store';
-import { 
+import {
   CheckCircle2, 
-  Circle, 
   Home, 
   MapPin, 
   Search, 
@@ -22,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { searchAirfields } from '@/services/openAIP';
 import { useToast } from '@/hooks/use-toast';
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuCheckboxItem,
@@ -44,7 +43,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
   const [openAIPResults, setOpenAIPResults] = useState<Airfield[]>([]);
   const [searchMode, setSearchMode] = useState<'local' | 'openAIP'>('local');
   const { toast } = useToast();
-  
+
   // Filter options
   const [filterOptions, setFilterOptions] = useState({
     showVisited: true,
@@ -52,7 +51,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
     showOther: true,
     showHome: true,
   });
-  
+
   // Sort options
   const [sortOption, setSortOption] = useState<'name' | 'icao' | 'status'>('name');
   
@@ -137,7 +136,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
       description: `${airfield.name} has been added to your collection.`,
     });
   };
-  
+
   // Export airfields as CSV
   const exportAirfields = () => {
     // Create CSV content
@@ -236,15 +235,10 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
         return 0;
     }
   });
-  
+
   return (
     <div className={cn("flex flex-col h-full bg-card rounded-md border", className)}>
-      <div className="p-3 border-b">
-        <h2 className="font-bold text-lg mb-2 flex items-center gap-2">
-          <MapPin className="h-5 w-5" />
-          Airfields
-        </h2>
-        
+      <div className="p-3 border-b">      
         {/* Search toggle buttons */}
         <div className="flex mb-2 space-x-1">
           <Button
@@ -412,7 +406,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
         )}
       </div>
 
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 h-100">
         {sortedAirfields.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
             <MapPin className="h-8 w-8 mb-2 opacity-50" />
@@ -443,37 +437,28 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     {searchMode === 'local' ? (
-                      airfield.id === homeAirfieldId ? (
-                        <Badge variant="default" className="bg-primary text-primary-foreground">Home</Badge>
-                      ) : airfield.visited ? (
+                      <div className='flex items-center gap-1'>
+                      {airfield.id === homeAirfieldId && (
+                        <Badge variant="default" className="bg-primary text-primary-foreground">
+                          <Home className="h-3 w-3" />
+                        </Badge>
+                      )}
+
+                      {airfield.visited ? (
                         <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">Visited</Badge>
                       ) : airfield.planned ? (
                         <Badge variant="outline" className="border-amber-500 text-amber-700">Planned</Badge>
                       ) : (
                         <Badge variant="outline" className="text-muted-foreground">Not Visited</Badge>
-                      )
+                      )}
+                      </div>
                     ) : (
                       <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-200">OpenAIP</Badge>
                     )}
                   </div>
                 </div>
                 
-                {searchMode === 'local' ? (
-                  <div className="mt-2 flex items-center gap-2">
-                    <Button 
-                      variant={airfield.id === homeAirfieldId ? "default" : "outline"}
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSetHomeAirfield(airfield);
-                      }}
-                      className="flex items-center gap-1"
-                    >
-                      <Home className="h-3.5 w-3.5" />
-                      {airfield.id === homeAirfieldId ? "Home Base" : "Set as Home"}
-                    </Button>
-                  </div>
-                ) : (
+                {searchMode === 'openAIP' && (
                   <div className="mt-2 flex items-center gap-2">
                     <Button 
                       variant="outline"
