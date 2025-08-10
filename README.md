@@ -6,7 +6,7 @@
 - React Router 7.5.1
 
 ## Roadmap
-A roadmap is available in ROADMAP.md.
+A roadmap is available in [ROADMAP.md](roadmap.md).
 
 ## Quick Start
 

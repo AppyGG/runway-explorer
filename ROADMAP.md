@@ -14,9 +14,12 @@
 - [x] Implement airfield data details panel
 - [x] Add statistics and metrics for flights
 - [x] Add data export functionality
+- [ ] Cleanup flights data parsing (altitude max, average speed)
+- [ ] Add flights metadata (aircraft, photos, comments, trace color)
+- [ ] Add flights filters
 
 ## Nice to have
 - [ ] Add account management & cross devices data sync
-- [ ] Dark mode
+- [x] Dark mode
 - [ ] Map customization (switch maps, custom layers...)
 - [ ] Create clean init process
