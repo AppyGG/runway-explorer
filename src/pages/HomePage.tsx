@@ -6,7 +6,8 @@ import {
   Settings,
   FileSymlink,
   CircleHelp,
-  Route
+  Route,
+  TowerControl
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -171,7 +172,7 @@ function HomePage() {
             <Tabs defaultValue="airfields" className="h-full flex flex-col">
               <TabsList className="w-full grid grid-cols-2">
                 <TabsTrigger value="airfields" className="flex items-center gap-1">
-                  <FileSymlink className="h-4 w-4" /> Airfields
+                  <TowerControl className="h-4 w-4" /> Airfields
                 </TabsTrigger>
                 <TabsTrigger value="flights" className="flex items-center gap-1">
                   <Plane className="h-4 w-4" /> Flights
