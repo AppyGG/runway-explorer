@@ -237,7 +237,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
   });
 
   return (
-    <div className={cn("flex flex-col h-full bg-card rounded-md border", className)}>
+    <div className={cn("flex flex-col h-full max-h-full bg-card rounded-md border overflow-hidden", className)}>
       <div className="p-3 border-b">      
         {/* Search toggle buttons */}
         <div className="flex mb-2 space-x-1">
@@ -406,7 +406,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
         )}
       </div>
 
-      <ScrollArea className="flex-1 h-100">
+      <ScrollArea className="flex-1 overflow-hidden h-full max-h-[calc(100vh-320px)]">
         {sortedAirfields.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
             <MapPin className="h-8 w-8 mb-2 opacity-50" />

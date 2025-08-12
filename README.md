@@ -6,7 +6,7 @@
 - React Router 7.5.1
 
 ## Roadmap
-A roadmap is available in [ROADMAP.md](roadmap.md).
+A roadmap is available in [ROADMAP.md](ROADMAP.md).
 
 ## Quick Start
 
@@ -22,13 +22,15 @@ npm install
 2. Start development server:
 ```bash
 bun dev
-# or npm run dev
+# or
+npm run dev
 ```
 
 3. Build for production:
 ```bash
 bun run build
-# or npm run build
+# or
+npm run build
 ```
 
 ## Development

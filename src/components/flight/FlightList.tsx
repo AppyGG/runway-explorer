@@ -56,7 +56,7 @@ const FlightList = ({ onSelectFlight, className = '' }: FlightListProps) => {
   };
   
   return (
-    <Card className={`flex flex-col h-full ${className}`}>
+    <Card className={`flex flex-col h-full overflow-hidden ${className}`}>
       <CardHeader className="pb-3">
         <CardTitle className="text-xl flex items-center gap-2">
           <Plane className="h-5 w-5 text-primary" />
@@ -75,7 +75,7 @@ const FlightList = ({ onSelectFlight, className = '' }: FlightListProps) => {
       </CardHeader>
       <CardContent className="flex-grow pb-0 overflow-hidden">
         {filteredFlights.length > 0 ? (
-          <ScrollArea className="h-[calc(100%-1rem)] pr-3">
+          <ScrollArea className="max-h-[calc(100%-1rem)] pr-3 overflow-hidden">
             <div className="space-y-3">
               {filteredFlights.map(flight => {
                 const stats = calculateFlightStatistics(flight);
