@@ -5,41 +5,46 @@ import { useAirfieldStore } from '@/store/airfield-store';
 import { Airfield, FlightPath } from '@/types/airfield';
 import 'leaflet/dist/leaflet.css';
 
+// const iconSize: Point(26, 38, false);
+// const iconAnchor = [16, 41];
+// const popupAnchor = [1, -34];
+// const shadowSize = [38, 38];
+
 // Fix for default icon issue in Leaflet with bundlers
 const defaultIcon = new Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+  iconUrl: '/pin_icon_blue.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
+  iconSize: [26, 38], 
+  iconAnchor: [13, 38],
   popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+  shadowSize: [38, 38]
 });
 
 const visitedIcon = new Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
+  iconUrl: '/pin_icon_green.png',
+  shadowUrl: '//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [26, 38], 
+  iconAnchor: [13, 38],
   popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+  shadowSize: [38, 38]
 });
 
 const plannedIcon = new Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-gold.png',
+  iconUrl: '/pin_icon_yellow.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
+  iconSize: [26, 38], 
+  iconAnchor: [13, 38],
   popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+  shadowSize: [38, 38]
 });
 
 const homeIcon = new Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+  iconUrl: '/pin_icon_red.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
+  iconSize: [26, 38], 
+  iconAnchor: [13, 38],
   popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+  shadowSize: [38, 38]
 });
 
 // Component to recenter map when home airfield changes
@@ -48,7 +53,7 @@ const MapRecenter = ({ airfield }: { airfield: Airfield | null }) => {
   
   useEffect(() => {
     if (airfield) {
-      map.setView([airfield.coordinates.lat, airfield.coordinates.lng], 10);
+      map.setView([airfield.coordinates.lat, airfield.coordinates.lng], 9);
     }
   }, [map, airfield]);
   
@@ -60,6 +65,27 @@ interface MapViewProps {
   onFlightPathClick?: (flightPath: FlightPath) => void;
   selectedFlightPath?: FlightPath | null;
   className?: string;
+}
+
+const MapClickHandler = ({ resetSelectedFlightPath }: { resetSelectedFlightPath: () => void }) => {
+  const map = useMap();
+  useEffect(() => {
+    const handleClick = (e: any) => {
+      // Prevent default click behavior
+      e.originalEvent.preventDefault();
+      e.originalEvent.stopPropagation();
+
+      resetSelectedFlightPath();
+    };
+
+    map.on('click', handleClick);
+
+    return () => {
+      map.off('click', handleClick);
+    };
+  }, [map]);
+  
+  return null;
 }
 
 const MapView = ({ onMarkerClick, onFlightPathClick, selectedFlightPath, className = '' }: MapViewProps) => {
@@ -76,7 +102,7 @@ const MapView = ({ onMarkerClick, onFlightPathClick, selectedFlightPath, classNa
   const defaultCenter = useMemo(() => {
     if (homeAirfield) return [homeAirfield.coordinates.lat, homeAirfield.coordinates.lng];
     if (airfields.length > 0) return [airfields[0].coordinates.lat, airfields[0].coordinates.lng];
-    return [50.323889, 2.802778]; // Default to San Francisco
+    return [50.32389, 2.80278];
   }, [airfields, homeAirfield]);
   
   const handleMarkerClick = (airfield: Airfield) => {
@@ -115,11 +141,14 @@ const MapView = ({ onMarkerClick, onFlightPathClick, selectedFlightPath, classNa
 
   // Handle flight path click
   const handleFlightPathClick = (flightPath: FlightPath) => {
-    if (onFlightPathClick) {
-      onFlightPathClick(flightPath);
-    }
+    onFlightPathClick(flightPath);
   };
-  
+
+  // Clear the selected flight path
+  const resetSelectedFlightPath = () => {
+    onFlightPathClick(null);
+  };
+
   return (
     <div className={`w-full h-full rounded-md overflow-hidden ${className}`}>
       <MapContainer
@@ -141,9 +170,9 @@ const MapView = ({ onMarkerClick, onFlightPathClick, selectedFlightPath, classNa
             key={flightPath.id}
             positions={flightPath.coordinates}
             pathOptions={{
-              color: selectedFlightPath?.id === flightPath.id ? '#00ff55ff' : '#ff9500ff',
-              weight: selectedFlightPath?.id === flightPath.id ? 4 : 4,
-              opacity: selectedFlightPath?.id === flightPath.id ? 1 : 0.7
+              color: '#d53f94ff',
+              weight: 4,
+              opacity: selectedFlightPath === null ? 0.9 : selectedFlightPath?.id === flightPath.id ? 1 : 0.4
             }}
             eventHandlers={{
               click: () => handleFlightPathClick(flightPath)
@@ -184,6 +213,9 @@ const MapView = ({ onMarkerClick, onFlightPathClick, selectedFlightPath, classNa
 
         {/* Auto fit to selected flight path */}
         {selectedFlightPath && <FlightPathFit flightPath={selectedFlightPath} />}
+
+        {/* Click handler to reset selected flight path */}
+        {selectedFlightPath && <MapClickHandler resetSelectedFlightPath={resetSelectedFlightPath} />}
       </MapContainer>
     </div>
   );
