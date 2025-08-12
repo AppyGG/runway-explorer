@@ -1,4 +1,15 @@
-# Flight Paths Archive
+# Runway Explorer
+
+Runway explorer is a small application for private pilots designed to visualize airfields you visited or want to visite in futur flights 🛩️
+
+## Features
+- **Interactive Map**: View airfields and flight paths with dynamic markers.
+- **Flight Path Management**: Load your previous flight trace (GPX or KML files), auto add airfields, and keep track of where you landed.
+- **Airfield Management**: Manage your airfields bucket list, access detailed information with OpenAIP integration.
+
+|VFR|Night VFR|
+|---|---|
+|<img src="runway_explorer_lightmode.jpg">|<img src="runway_explorer_darkmode.jpg">|
 
 ## Tech Stack
 - React 18.2.0 + TypeScript 5.7.2 + Vite 6.3.1
