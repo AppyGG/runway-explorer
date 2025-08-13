@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Plane, 
   Map as MapIcon, 
@@ -12,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import LanguageSelector from '@/components/LanguageSelector';
 import MapView from '@/components/map/MapView';
 import AirfieldList from '@/components/airfield/AirfieldList';
 import AirfieldDetails from '@/components/airfield/AirfieldDetails';
@@ -28,6 +30,7 @@ function HomePage() {
   const [selectedAirfield, setSelectedAirfield] = useState<Airfield | null>(null);
   const [selectedFlightPath, setSelectedFlightPath] = useState<FlightPath | null>(null);
   const [activeTab, setActiveTab] = useState<string>("map");
+  const { t } = useTranslation();
   
   // Find home airfield
   const homeAirfield = airfields.find(a => a.id === homeAirfieldId) || null;
@@ -64,11 +67,12 @@ function HomePage() {
             trigger={
               <Button variant="outline" size="sm">
                 <Route className="h-4 w-4 mr-1" />
-                <span className="hidden sm:inline">Upload Flight</span>
+                <span className="hidden sm:inline">{t('flights.upload')}</span>
               </Button>
             } 
             onUploadComplete={handleFlightUploadComplete}
           />
+          <LanguageSelector />
           {/* <Button variant="ghost" size="icon">
             <Settings className="h-4 w-4" />
           </Button> */}
@@ -88,13 +92,13 @@ function HomePage() {
           <div className="bg-muted/50 p-2 border-b">
             <TabsList className="w-full grid grid-cols-3">
               <TabsTrigger value="map" className="flex items-center gap-1">
-                <MapIcon className="h-4 w-4" /> Map
+                <MapIcon className="h-4 w-4" /> {t('map.title')}
               </TabsTrigger>
               <TabsTrigger value="airfields" className="flex items-center gap-1">
-                <FileSymlink className="h-4 w-4" /> Airfields
+                <FileSymlink className="h-4 w-4" /> {t('airfields.title')}
               </TabsTrigger>
               <TabsTrigger value="flights" className="flex items-center gap-1">
-                <Plane className="h-4 w-4" /> Flights
+                <Plane className="h-4 w-4" /> {t('flights.title')}
               </TabsTrigger>
             </TabsList>
           </div>
@@ -147,7 +151,7 @@ function HomePage() {
           <TabsContent value="flights" className="flex-1 p-0 m-0">
             <div className="h-full p-2">
               <div className="flex mb-2 justify-between">
-                <h2 className="text-lg font-semibold">Flight Logs</h2>
+                <h2 className="text-lg font-semibold">{t('flights.title')}</h2>
                 <FlightUploadDialog onUploadComplete={handleFlightUploadComplete} />
               </div>
               <FlightList
@@ -172,10 +176,10 @@ function HomePage() {
             <Tabs defaultValue="airfields" className="h-full flex flex-col">
               <TabsList className="w-full grid grid-cols-2">
                 <TabsTrigger value="airfields" className="flex items-center gap-1">
-                  <TowerControl className="h-4 w-4" /> Airfields
+                  <TowerControl className="h-4 w-4" /> {t('airfields.title')}
                 </TabsTrigger>
                 <TabsTrigger value="flights" className="flex items-center gap-1">
-                  <Plane className="h-4 w-4" /> Flights
+                  <Plane className="h-4 w-4" /> {t('flights.title')}
                 </TabsTrigger>
               </TabsList>
               

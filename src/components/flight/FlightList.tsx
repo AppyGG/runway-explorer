@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAirfieldStore } from '@/store/airfield-store';
 import { FlightPath } from '@/types/airfield';
 import { Input } from '@/components/ui/input';
@@ -30,6 +31,7 @@ interface FlightListProps {
 const FlightList = ({ onSelectFlight, className = '' }: FlightListProps) => {
   const { flightPaths, airfields, deleteFlightPath } = useAirfieldStore();
   const [searchQuery, setSearchQuery] = useState('');
+  const { t } = useTranslation();
   
   // Filter flights based on search query
   const filteredFlights = flightPaths.filter(flight => 
@@ -60,14 +62,14 @@ const FlightList = ({ onSelectFlight, className = '' }: FlightListProps) => {
       <CardHeader className="pb-3">
         <CardTitle className="text-xl flex items-center gap-2">
           <Plane className="h-5 w-5 text-primary" />
-          Flight Logs
+          {t('flights.title')}
         </CardTitle>
         <CardDescription>
           {flightPaths.length} flight{flightPaths.length !== 1 ? 's' : ''} recorded
         </CardDescription>
         <Input 
           type="text"
-          placeholder="Search flights..."
+          placeholder={t('flights.search')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="mt-2"
@@ -132,11 +134,11 @@ const FlightList = ({ onSelectFlight, className = '' }: FlightListProps) => {
             <Plane className="h-16 w-16 mb-4 opacity-20" />
             {flightPaths.length === 0 ? (
               <>
-                <p className="mb-2">No flight logs yet</p>
-                <p className="text-sm">Upload KML or GPX files to visualize your flights</p>
+                <p className="mb-2">{t('flights.empty')}</p>
+                <p className="text-sm">{t('flights.uploadInfo')}</p>
               </>
             ) : (
-              <p>No flights matching your search</p>
+              <p>{t('flights.noFlightsMatch')}</p>
             )}
           </div>
         )}

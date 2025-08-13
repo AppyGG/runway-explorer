@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAirfieldStore } from '@/store/airfield-store';
 import {
   CheckCircle2, 
@@ -43,6 +44,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
   const [openAIPResults, setOpenAIPResults] = useState<Airfield[]>([]);
   const [searchMode, setSearchMode] = useState<'local' | 'openAIP'>('local');
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   // Filter options
   const [filterOptions, setFilterOptions] = useState({
@@ -251,7 +253,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
             className="flex-1"
           >
             <Search className="h-3.5 w-3.5 mr-1" />
-            My Airfields
+            {t('airfields.mine')}
           </Button>
           <Button
             size="sm"
@@ -260,7 +262,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
             className="flex-1"
           >
             <Globe className="h-3.5 w-3.5 mr-1" />
-            OpenAIP Search
+            {t('openaip.search')}
           </Button>
         </div>
         
@@ -269,7 +271,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
           <div className="relative flex-1">
             <Search className="w-4 h-4 absolute left-2.5 top-2.5 text-muted-foreground" />
             <Input
-              placeholder={searchMode === 'local' ? "Search my airfields..." : "Search global airfields (min 3 chars)..."}
+              placeholder={searchMode === 'local' ? t('airfields.search.mine') : t('airfields.search.openaip')}
               className="pl-8"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -311,7 +313,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
                         }
                       />
                       <label htmlFor="show-home" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-1">
-                        <Home className="h-3.5 w-3.5" /> Home
+                        <Home className="h-3.5 w-3.5" /> {t('airfields.filter.home')}
                       </label>
                     </div>
                     
@@ -324,7 +326,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
                         }
                       />
                       <label htmlFor="show-visited" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-1">
-                        <CheckCircle2 className="h-3.5 w-3.5" /> Visited
+                        <CheckCircle2 className="h-3.5 w-3.5" /> {t('airfields.filter.visited')}
                       </label>
                     </div>
                     
@@ -337,7 +339,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
                         }
                       />
                       <label htmlFor="show-planned" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-1">
-                        <CircleDashed className="h-3.5 w-3.5" /> Planned
+                        <CircleDashed className="h-3.5 w-3.5" /> {t('airfields.filter.planned')}
                       </label>
                     </div>
                     
@@ -350,7 +352,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
                         }
                       />
                       <label htmlFor="show-other" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                        Other
+                        {t('airfields.filter.other')}
                       </label>
                     </div>
                   </div>
@@ -445,11 +447,11 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
                       )}
 
                       {airfield.visited ? (
-                        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">Visited</Badge>
+                        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">{t('airfields.status.visited')}</Badge>
                       ) : airfield.planned ? (
-                        <Badge variant="outline" className="border-amber-500 text-amber-700">Planned</Badge>
+                        <Badge variant="outline" className="border-amber-500 text-amber-700">{t('airfields.status.planned')}</Badge>
                       ) : (
-                        <Badge variant="outline" className="text-muted-foreground">Not Visited</Badge>
+                        <Badge variant="outline" className="text-muted-foreground">{t('airfields.status.notVisited')}</Badge>
                       )}
                       </div>
                     ) : (
@@ -470,7 +472,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
                       className="flex items-center gap-1"
                     >
                       <PlaneTakeoff className="h-3.5 w-3.5" />
-                      Add to My Airfields
+                      {t('openaip.addToMyAirfields')}
                     </Button>
                   </div>
                 )}
@@ -511,7 +513,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
             }}
           >
             <Globe className="h-3.5 w-3.5" />
-            Search OpenAIP
+            {t('openaip.search')}
           </Button>
         )}
       </div>
