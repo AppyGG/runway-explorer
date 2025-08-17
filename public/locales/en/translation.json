@@ -89,5 +89,19 @@
 
       "openaip.search": "OpenAIP Search",
       "openaip.results": "OpenAIP Results",
-      "openaip.addToMyAirfields": "Add to My Airfields"
+      "openaip.addToMyAirfields": "Add to My Airfields",
+
+      "preferences.title": "Preferences",
+      "preferences.flightPathColor": "Flight Path Color",
+      "preferences.selectedPathColor": "Selected Flight Path Color",
+      "preferences.flightPathWidth": "Flight Path Width",
+      "preferences.selectedPathWidth": "Selected Flight Path Width",
+      "preferences.save": "Save Preferences",
+      "preferences.reset": "Reset to Defaults",
+      "preferences.colors.blue": "Blue",
+      "preferences.colors.red": "Red",
+      "preferences.colors.green": "Green",
+      "preferences.colors.orange": "Orange",
+      "preferences.colors.purple": "Purple",
+      "preferences.colors.black": "Black"
     }

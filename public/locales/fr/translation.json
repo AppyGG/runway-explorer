@@ -86,5 +86,19 @@
       "actions.export": "Exporter",
 
       "openaip.search": "Recherche OpenAIP",
-      "openaip.results": "Résultats OpenAIP"
+      "openaip.results": "Résultats OpenAIP",
+
+      "preferences.title": "Préférences",
+      "preferences.flightPathColor": "Couleur des traces de vol",
+      "preferences.selectedPathColor": "Couleur de la trace sélectionnée",
+      "preferences.flightPathWidth": "Épaisseur des traces de vol",
+      "preferences.selectedPathWidth": "Épaisseur de la trace sélectionnée",
+      "preferences.save": "Enregistrer les préférences",
+      "preferences.reset": "Réinitialiser par défaut",
+      "preferences.colors.blue": "Bleu",
+      "preferences.colors.red": "Rouge",
+      "preferences.colors.green": "Vert",
+      "preferences.colors.orange": "Orange",
+      "preferences.colors.purple": "Violet",
+      "preferences.colors.black": "Noir"
     }

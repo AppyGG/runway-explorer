@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap, Polyline } from 'react-leaflet';
 import { Icon, latLngBounds } from 'leaflet';
 import { useAirfieldStore } from '@/store/airfield-store';
+import { usePreferencesStore } from '@/store/preferences-store';
 import { Airfield, FlightPath } from '@/types/airfield';
 import { Button } from '@/components/ui/button';
 import { Layers } from 'lucide-react';
@@ -124,6 +125,7 @@ const MapClickHandler = ({ resetSelectedFlightPath }: { resetSelectedFlightPath:
 
 const MapView = ({ onMarkerClick, onFlightPathClick, selectedFlightPath, className = '' }: MapViewProps) => {
   const { airfields, flightPaths, homeAirfieldId } = useAirfieldStore();
+  const { map: mapPreferences } = usePreferencesStore();
   const [selectedAirfieldId, setSelectedAirfieldId] = useState<string | null>(null);
   const [currentMapStyleIndex, setCurrentMapStyleIndex] = useState(0);
   const stylePopupRef = useRef<HTMLDivElement | null>(null);
@@ -287,8 +289,8 @@ const MapView = ({ onMarkerClick, onFlightPathClick, selectedFlightPath, classNa
             key={flightPath.id}
             positions={flightPath.coordinates}
             pathOptions={{
-              color: '#d53f94ff',
-              weight: 4,
+              color: mapPreferences.flightPathColor,
+              weight: mapPreferences.flightPathWidth,
               opacity: selectedFlightPath === null ? 0.9 : selectedFlightPath?.id === flightPath.id ? 1 : 0.4
             }}
             eventHandlers={{
