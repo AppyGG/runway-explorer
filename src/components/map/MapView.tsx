@@ -46,7 +46,7 @@ const mapStyles: MapStyle[] = [
 
 // Fix for default icon issue in Leaflet with bundlers
 const defaultIcon = new Icon({
-  iconUrl: '/pin_icon_blue.png',
+  iconUrl: '/pins/pin_icon_blue.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
   iconSize: [26, 38], 
   iconAnchor: [13, 38],
@@ -55,7 +55,7 @@ const defaultIcon = new Icon({
 });
 
 const visitedIcon = new Icon({
-  iconUrl: '/pin_icon_green.png',
+  iconUrl: '/pins/pin_icon_green.png',
   shadowUrl: '//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
   iconSize: [26, 38], 
   iconAnchor: [13, 38],
@@ -64,7 +64,7 @@ const visitedIcon = new Icon({
 });
 
 const plannedIcon = new Icon({
-  iconUrl: '/pin_icon_yellow.png',
+  iconUrl: '/pins/pin_icon_yellow.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
   iconSize: [26, 38], 
   iconAnchor: [13, 38],
@@ -73,7 +73,7 @@ const plannedIcon = new Icon({
 });
 
 const homeIcon = new Icon({
-  iconUrl: '/pin_icon_red.png',
+  iconUrl: '/pins/pin_icon_red.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
   iconSize: [26, 38], 
   iconAnchor: [13, 38],
