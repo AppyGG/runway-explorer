@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap, Polyline } from 'react-leaflet';
-import { Icon, latLngBounds } from 'leaflet';
+import { Icon, latLngBounds, LatLng } from 'leaflet';
 import { useAirfieldStore } from '@/store/airfield-store';
 import { usePreferencesStore } from '@/store/preferences-store';
 import { Airfield, FlightPath } from '@/types/airfield';
 import { Button } from '@/components/ui/button';
-import { Layers } from 'lucide-react';
+import { Layers, Maximize2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import 'leaflet/dist/leaflet.css';
 
 // Define available map styles
@@ -228,10 +229,77 @@ const MapView = ({ onMarkerClick, onFlightPathClick, selectedFlightPath, classNa
     return null;
   };
 
+  // Auto-zoom modes
+  type AutoZoomMode = 'airfields' | 'flightPaths' | null;
+  const [autoZoomMode, setAutoZoomMode] = useState<AutoZoomMode>(null);
+
+  // Auto-zoom component that fits the map to the selected mode
+  const AutoZoomControl = ({ mode }: { mode: AutoZoomMode }) => {
+    const map = useMap();
+    
+    useEffect(() => {
+      if (!mode) return;
+      
+      let bounds: any = null;
+      
+      if (mode === 'airfields' && airfields.length > 0) {
+        // Fit to all airfields
+        const coords = airfields.map(a => new LatLng(a.coordinates.lat, a.coordinates.lng));
+        bounds = latLngBounds(coords);
+      } else if (mode === 'flightPaths' && flightPaths.length > 0) {
+        // Fit to all flight paths
+        const allCoords: [number, number][] = [];
+        flightPaths.forEach(fp => {
+          allCoords.push(...fp.coordinates);
+        });
+        if (allCoords.length > 0) {
+          bounds = latLngBounds(allCoords);
+        }
+      }
+      
+      if (bounds) {
+        map.fitBounds(bounds, { padding: [50, 50] });
+      }
+    }, [map, mode]);
+    
+    return null;
+  };
+
+  // Toggle auto-zoom mode
+  const toggleAutoZoom = () => {
+    if (autoZoomMode === null) {
+      setAutoZoomMode('airfields');
+    } else if (autoZoomMode === 'airfields') {
+      setAutoZoomMode('flightPaths');
+    } else {
+      setAutoZoomMode(null);
+    }
+  };
+
+  // Get button label for auto-zoom
+  const { t } = useTranslation();
+  const getAutoZoomLabel = () => {
+    if (autoZoomMode === null) return t('map.autoZoom.off');
+    if (autoZoomMode === 'airfields') return t('map.autoZoom.airfields');
+    return t('map.autoZoom.flightPaths');
+  };
+
   return (
     <div className={`w-full h-full rounded-md overflow-hidden relative ${className}`}>
-       {/* Map Style Selector Button - positioned absolutely over the map */}
-        <div className="absolute top-2 right-2 z-[500]">
+       {/* Map Controls - positioned absolutely over the map */}
+        <div className="absolute top-2 right-2 z-[500] flex flex-col gap-2">
+          {/* Auto-zoom button */}
+          <Button 
+            variant={autoZoomMode !== null ? "default" : "secondary"}
+            size="sm" 
+            onClick={toggleAutoZoom}
+            title={t('map.autoZoom.tooltip')}
+          >
+            <Maximize2 className="h-4 w-4 mr-1" />
+            {getAutoZoomLabel()}
+          </Button>
+          
+          {/* Map Style Selector */}
           <div className="relative" ref={stylePopupRef}>
             <Button 
               variant="secondary" 
@@ -357,6 +425,9 @@ const MapView = ({ onMarkerClick, onFlightPathClick, selectedFlightPath, classNa
 
         {/* Auto fit to selected flight path */}
         {selectedFlightPath && <FlightPathFit flightPath={selectedFlightPath} />}
+
+        {/* Auto-zoom control */}
+        <AutoZoomControl mode={autoZoomMode} />
 
         {/* Click handler to reset selected flight path */}
         {selectedFlightPath && <MapClickHandler resetSelectedFlightPath={resetSelectedFlightPath} />}

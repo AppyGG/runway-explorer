@@ -10,6 +10,10 @@
       "map.style.satellite": "Satellite",
       "map.style.terrain": "Terrain",
       "map.style.openAIP": "Aviation OpenAIP",
+      "map.autoZoom.tooltip": "Basculer le mode zoom automatique",
+      "map.autoZoom.off": "Zoom Auto",
+      "map.autoZoom.airfields": "Aérodromes",
+      "map.autoZoom.flightPaths": "Vols",
       
       "airfields.title": "Aérodromes",
       "airfields.filter.all": "Tous les aérodromes",
