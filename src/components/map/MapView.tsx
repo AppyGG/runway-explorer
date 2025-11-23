@@ -97,10 +97,13 @@ const MapRecenter = ({ airfield }: { airfield: Airfield | null }) => {
 };
 
 interface MapViewProps {
+  airfields?: Airfield[]; // Optional: for shared view
+  flightPaths?: FlightPath[]; // Optional: for shared view
   onMarkerClick?: (airfield: Airfield) => void;
   onFlightPathClick?: (flightPath: FlightPath) => void;
   selectedFlightPath?: FlightPath | null;
   className?: string;
+  readOnly?: boolean; // Read-only mode for shared view
 }
 
 const MapClickHandler = ({ resetSelectedFlightPath }: { resetSelectedFlightPath: () => void }) => {
@@ -124,9 +127,22 @@ const MapClickHandler = ({ resetSelectedFlightPath }: { resetSelectedFlightPath:
   return null;
 }
 
-const MapView = ({ onMarkerClick, onFlightPathClick, selectedFlightPath, className = '' }: MapViewProps) => {
-  const { airfields, flightPaths, homeAirfieldId } = useAirfieldStore();
+const MapView = ({ 
+  airfields: propsAirfields, 
+  flightPaths: propsFlightPaths,
+  onMarkerClick, 
+  onFlightPathClick, 
+  selectedFlightPath, 
+  className = '',
+  readOnly = false
+}: MapViewProps) => {
+  const storeData = useAirfieldStore();
   const { map: mapPreferences } = usePreferencesStore();
+  
+  // Use props if provided (shared view), otherwise use store (normal view)
+  const airfields = propsAirfields || storeData.airfields;
+  const flightPaths = propsFlightPaths || storeData.flightPaths;
+  const homeAirfieldId = readOnly ? null : storeData.homeAirfieldId;
   const [selectedAirfieldId, setSelectedAirfieldId] = useState<string | null>(null);
   const [currentMapStyleIndex, setCurrentMapStyleIndex] = useState(0);
   const stylePopupRef = useRef<HTMLDivElement | null>(null);

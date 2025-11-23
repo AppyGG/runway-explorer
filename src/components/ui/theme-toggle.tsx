@@ -1,24 +1,18 @@
-import React from "react";
-import { Sun, Moon } from "lucide-react";
-import { useTheme } from "../../hooks/use-theme";
+import { Moon, Sun } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "@/hooks/use-theme";
 
-export const ThemeToggle: React.FC = () => {
+export function ThemeToggle() {
   const { theme, toggle } = useTheme();
 
   return (
-    <button
-      onClick={toggle}
-      aria-label={theme === "dark" ? "Switch to light" : "Switch to dark"}
-      title={theme === "dark" ? "Switch to light" : "Switch to light"}
-      className="inline-flex items-center justify-center p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2
-                 focus:ring-indigo-500 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800"
-      aria-pressed={theme === "dark"}
-    >
+    <Button variant="ghost" size="icon" onClick={toggle}>
       {theme === "dark" ? (
-        <Sun className="w-5 h-5" />
+        <Sun className="h-4 w-4" />
       ) : (
-        <Moon className="w-5 h-5" />
+        <Moon className="h-4 w-4" />
       )}
-    </button>
+      <span className="sr-only">Toggle theme</span>
+    </Button>
   );
-};
+}

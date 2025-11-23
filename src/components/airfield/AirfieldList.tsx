@@ -33,12 +33,27 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 
 interface AirfieldListProps {
+  airfields?: Airfield[]; // Optional: for shared view
+  homeAirfieldId?: string | null; // Optional: for shared view
   onSelectAirfield?: (airfield: Airfield) => void;
   className?: string;
+  readOnly?: boolean; // Read-only mode for shared view
 }
 
-const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) => {
-  const { airfields, homeAirfieldId, setHomeAirfield, addAirfield } = useAirfieldStore();
+const AirfieldList = ({ 
+  airfields: propsAirfields,
+  homeAirfieldId: propsHomeAirfieldId,
+  onSelectAirfield, 
+  className = '',
+  readOnly = false
+}: AirfieldListProps) => {
+  const storeData = useAirfieldStore();
+  
+  // Use props if provided (shared view), otherwise use store (normal view)
+  const airfields = propsAirfields || storeData.airfields;
+  const homeAirfieldId = propsHomeAirfieldId !== undefined ? propsHomeAirfieldId : storeData.homeAirfieldId;
+  const setHomeAirfield = storeData.setHomeAirfield;
+  const addAirfield = storeData.addAirfield;
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [openAIPResults, setOpenAIPResults] = useState<Airfield[]>([]);
@@ -241,30 +256,32 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
   return (
     <div className={cn("flex flex-col h-full max-h-full bg-card rounded-md border overflow-hidden", className)}>
       <div className="p-3 border-b">      
-        {/* Search toggle buttons */}
-        <div className="flex mb-2 space-x-1">
-          <Button
-            size="sm"
-            variant={searchMode === 'local' ? 'default' : 'outline'}
-            onClick={() => {
-              setSearchMode('local');
-              setOpenAIPResults([]);
-            }}
-            className="flex-1"
-          >
-            <Search className="h-3.5 w-3.5 mr-1" />
-            {t('airfields.mine')}
-          </Button>
-          <Button
-            size="sm"
-            variant={searchMode === 'openAIP' ? 'default' : 'outline'}
-            onClick={() => setSearchMode('openAIP')}
-            className="flex-1"
-          >
-            <Globe className="h-3.5 w-3.5 mr-1" />
-            {t('openaip.search')}
-          </Button>
-        </div>
+        {/* Search toggle buttons - hide in read-only mode */}
+        {!readOnly && (
+          <div className="flex mb-2 space-x-1">
+            <Button
+              size="sm"
+              variant={searchMode === 'local' ? 'default' : 'outline'}
+              onClick={() => {
+                setSearchMode('local');
+                setOpenAIPResults([]);
+              }}
+              className="flex-1"
+            >
+              <Search className="h-3.5 w-3.5 mr-1" />
+              {t('airfields.mine')}
+            </Button>
+            <Button
+              size="sm"
+              variant={searchMode === 'openAIP' ? 'default' : 'outline'}
+              onClick={() => setSearchMode('openAIP')}
+              className="flex-1"
+            >
+              <Globe className="h-3.5 w-3.5 mr-1" />
+              {t('openaip.search')}
+            </Button>
+          </div>
+        )}
         
         {/* Search input with filter dropdown */}
         <div className="flex gap-2 mb-2">
@@ -383,7 +400,7 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
             </DropdownMenu>
           )}
           
-          {searchMode === 'local' && (
+          {searchMode === 'local' && !readOnly && (
             <Button
               variant="outline"
               size="icon"
@@ -496,13 +513,13 @@ const AirfieldList = ({ onSelectAirfield, className = '' }: AirfieldListProps) =
       <div className="p-3 border-t flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
           {searchMode === 'local' 
-            ? `${sortedAirfields.length} airfields in collection` 
+            ? `${sortedAirfields.length} airfield${sortedAirfields.length !== 1 ? 's' : ''}` 
             : searchTerm.length < 3 
               ? "Enter at least 3 characters to search"
               : `${sortedAirfields.length} results from OpenAIP`
           }
         </div>
-        {searchMode === 'local' && (
+        {searchMode === 'local' && !readOnly && (
           <Button 
             size="sm" 
             variant="outline" 

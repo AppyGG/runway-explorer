@@ -24,12 +24,26 @@ import {
 import { calculateFlightStatistics } from '@/lib/flight-parser';
 
 interface FlightListProps {
+  flights?: FlightPath[]; // Optional: for shared view
+  airfields?: any[]; // Optional: for shared view
   onSelectFlight?: (flight: FlightPath) => void;
   className?: string;
+  readOnly?: boolean; // Read-only mode for shared view
 }
 
-const FlightList = ({ onSelectFlight, className = '' }: FlightListProps) => {
-  const { flightPaths, airfields, deleteFlightPath } = useAirfieldStore();
+const FlightList = ({ 
+  flights: propsFlights,
+  airfields: propsAirfields,
+  onSelectFlight, 
+  className = '',
+  readOnly = false
+}: FlightListProps) => {
+  const storeData = useAirfieldStore();
+  
+  // Use props if provided (shared view), otherwise use store (normal view)
+  const flightPaths = propsFlights || storeData.flightPaths;
+  const airfields = propsAirfields || storeData.airfields;
+  const deleteFlightPath = storeData.deleteFlightPath;
   const [searchQuery, setSearchQuery] = useState('');
   const { t } = useTranslation();
   
@@ -115,14 +129,16 @@ const FlightList = ({ onSelectFlight, className = '' }: FlightListProps) => {
                       <span className="text-xs text-muted-foreground">
                         {flight.fileType} file
                       </span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                        onClick={(e) => handleDeleteFlight(e, flight.id)}
-                      >
-                        <TrashIcon className="h-4 w-4" />
-                      </Button>
+                      {!readOnly && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                          onClick={(e) => handleDeleteFlight(e, flight.id)}
+                        >
+                          <TrashIcon className="h-4 w-4" />
+                        </Button>
+                      )}
                     </CardFooter>
                   </Card>
                 );
