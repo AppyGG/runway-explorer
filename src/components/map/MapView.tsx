@@ -284,24 +284,49 @@ const MapView = ({ onMarkerClick, onFlightPathClick, selectedFlightPath, classNa
         {homeAirfield && <MapRecenter airfield={homeAirfield} />}
         
         {/* Display flight paths */}
-        {flightPaths.map(flightPath => (
-          <Polyline
-            key={flightPath.id}
-            positions={flightPath.coordinates}
-            pathOptions={{
-              color: mapPreferences.flightPathColor,
-              weight: mapPreferences.flightPathWidth,
-              opacity: selectedFlightPath === null ? 0.9 : selectedFlightPath?.id === flightPath.id ? 1 : 0.4
-            }}
-            eventHandlers={{
-              click: () => handleFlightPathClick(flightPath)
-            }}
-          >
-            <Tooltip direction="top">
-              {flightPath.name} ({flightPath.date})
-            </Tooltip>
-          </Polyline>
-        ))}
+        {flightPaths.map(flightPath => {
+          const isSelected = selectedFlightPath?.id === flightPath.id;
+          const hasSelection = selectedFlightPath !== null;
+          
+          // Determine if this path should be hidden
+          const shouldHide = hasSelection && !isSelected && mapPreferences.hideOtherFlightPaths;
+          
+          // Skip rendering if should be hidden
+          if (shouldHide) return null;
+          
+          // Determine opacity
+          let opacity = 0.9;
+          if (hasSelection) {
+            if (isSelected) {
+              opacity = 1;
+            } else if (mapPreferences.fadeOtherFlightPaths) {
+              opacity = mapPreferences.otherFlightPathsOpacity;
+            }
+          }
+          
+          // Determine color and weight
+          const color = isSelected ? mapPreferences.selectedFlightPathColor : mapPreferences.flightPathColor;
+          const weight = isSelected ? mapPreferences.selectedFlightPathWidth : mapPreferences.flightPathWidth;
+          
+          return (
+            <Polyline
+              key={flightPath.id}
+              positions={flightPath.coordinates}
+              pathOptions={{
+                color: color,
+                weight: weight,
+                opacity: opacity
+              }}
+              eventHandlers={{
+                click: () => handleFlightPathClick(flightPath)
+              }}
+            >
+              <Tooltip direction="top">
+                {flightPath.name} ({flightPath.date})
+              </Tooltip>
+            </Polyline>
+          );
+        })}
         
         {/* Display all airfields */}
         {airfields.map(airfield => (

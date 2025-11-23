@@ -19,6 +19,7 @@ import {
 import {
   Slider
 } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { Label } from '@/components/ui/label';
 import { usePreferencesStore, MapPreferences } from '@/store/preferences-store';
 import { Settings } from 'lucide-react';
@@ -59,8 +60,12 @@ const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
     resetMapPreferences();
     setLocalPreferences({
       flightPathColor: '#d53f94',
-      flightPathWidth: 3,
-      selectedFlightPathWidth: 5
+      selectedFlightPathColor: '#ff0000',
+      flightPathWidth: 4,
+      selectedFlightPathWidth: 4,
+      hideOtherFlightPaths: false,
+      fadeOtherFlightPaths: true,
+      otherFlightPathsOpacity: 0.3
     });
   };
 
@@ -87,7 +92,7 @@ const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('preferences.title')}</DialogTitle>
         </DialogHeader>
@@ -164,6 +169,61 @@ const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
               />
               <span className="w-8 text-center">{localPreferences.selectedFlightPathWidth}</span>
             </div>
+          </div>
+          
+          <div className="border-t pt-4 mt-2">
+            <h4 className="text-sm font-medium mb-3">{t('preferences.otherFlightPaths')}</h4>
+            
+            <div className="grid grid-cols-3 items-center gap-4 mb-3">
+              <Label htmlFor="hideOtherFlightPaths" className="text-right text-sm">
+                {t('preferences.hideOtherPaths')}
+              </Label>
+              <div className="col-span-2">
+                <Switch 
+                  id="hideOtherFlightPaths"
+                  checked={localPreferences.hideOtherFlightPaths}
+                  onCheckedChange={(checked) => setLocalPreferences({...localPreferences, hideOtherFlightPaths: checked})}
+                />
+              </div>
+            </div>
+            
+            {!localPreferences.hideOtherFlightPaths && (
+              <>
+                <div className="grid grid-cols-3 items-center gap-4 mb-3">
+                  <Label htmlFor="fadeOtherFlightPaths" className="text-right text-sm">
+                    {t('preferences.fadeOtherPaths')}
+                  </Label>
+                  <div className="col-span-2">
+                    <Switch 
+                      id="fadeOtherFlightPaths"
+                      checked={localPreferences.fadeOtherFlightPaths}
+                      onCheckedChange={(checked) => setLocalPreferences({...localPreferences, fadeOtherFlightPaths: checked})}
+                    />
+                  </div>
+                </div>
+                
+                {localPreferences.fadeOtherFlightPaths && (
+                  <div className="grid grid-cols-3 items-center gap-4">
+                    <Label htmlFor="otherFlightPathsOpacity" className="text-right text-sm">
+                      {t('preferences.fadeOpacity')}
+                    </Label>
+                    <div className="col-span-2 flex items-center gap-4">
+                      <Slider 
+                        id="otherFlightPathsOpacity"
+                        defaultValue={[localPreferences.otherFlightPathsOpacity * 100]} 
+                        max={100} 
+                        min={0} 
+                        step={10}
+                        value={[localPreferences.otherFlightPathsOpacity * 100]}
+                        onValueChange={(values) => setLocalPreferences({...localPreferences, otherFlightPathsOpacity: values[0] / 100})}
+                        className="flex-1"
+                      />
+                      <span className="w-8 text-center">{Math.round(localPreferences.otherFlightPathsOpacity * 100)}%</span>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
         
