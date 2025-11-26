@@ -500,7 +500,7 @@ const AirfieldList = ({
                   )}
                   {airfield.runwayLength && (
                     <span className="text-muted-foreground">
-                      RW: {airfield.runwayLength}m ({airfield.runwaySurface})
+                      RW: {airfield.runwayLength}m {airfield.runwaySurface && (airfield.runwaySurface)}
                     </span>
                   )}
                 </div>

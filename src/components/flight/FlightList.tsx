@@ -22,6 +22,8 @@ import {
   ArrowDownRight
 } from 'lucide-react';
 import { calculateFlightStatistics } from '@/lib/flight-parser';
+import { usePreferencesStore } from '@/store/preferences-store';
+import { formatDistance } from '@/lib/unit-conversion';
 
 interface FlightListProps {
   flights?: FlightPath[]; // Optional: for shared view
@@ -46,6 +48,7 @@ const FlightList = ({
   const deleteFlightPath = storeData.deleteFlightPath;
   const [searchQuery, setSearchQuery] = useState('');
   const { t } = useTranslation();
+  const { units } = usePreferencesStore();
   
   // Filter flights based on search query
   const filteredFlights = flightPaths.filter(flight => 
@@ -122,7 +125,7 @@ const FlightList = ({
                       )}
                       <div className="flex items-center gap-1 text-muted-foreground">
                         <MapPin className="h-3.5 w-3.5" />
-                        Distance: {stats.totalDistance} NM
+                        {t('flights.distance')}: {formatDistance(stats.totalDistance, units.distance)}
                       </div>
                     </CardContent>
                     <CardFooter className="p-3 pt-2 flex justify-between">

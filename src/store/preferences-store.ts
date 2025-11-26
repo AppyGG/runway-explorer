@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export type DistanceUnit = 'nm' | 'km' | 'mi';
+export type SpeedUnit = 'kt' | 'kmh' | 'mph';
+
 export interface MapPreferences {
   flightPathColor: string;
   selectedFlightPathColor: string;
@@ -11,12 +14,20 @@ export interface MapPreferences {
   otherFlightPathsOpacity: number; // Opacity of other flight paths when faded (0-1)
 }
 
+export interface UnitPreferences {
+  distance: DistanceUnit;
+  speed: SpeedUnit;
+}
+
 export interface PreferencesState {
   map: MapPreferences;
+  units: UnitPreferences;
 
   // Actions
   updateMapPreferences: (preferences: Partial<MapPreferences>) => void;
   resetMapPreferences: () => void;
+  updateUnitPreferences: (preferences: Partial<UnitPreferences>) => void;
+  resetUnitPreferences: () => void;
 }
 
 const DEFAULT_MAP_PREFERENCES: MapPreferences = {
@@ -29,10 +40,16 @@ const DEFAULT_MAP_PREFERENCES: MapPreferences = {
   otherFlightPathsOpacity: 0.3
 };
 
+const DEFAULT_UNIT_PREFERENCES: UnitPreferences = {
+  distance: 'nm', // Nautical miles (default for aviation)
+  speed: 'kt' // Knots (default for aviation)
+};
+
 export const usePreferencesStore = create<PreferencesState>()(
   persist(
     (set) => ({
       map: { ...DEFAULT_MAP_PREFERENCES },
+      units: { ...DEFAULT_UNIT_PREFERENCES },
       
       updateMapPreferences: (preferences) => set((state) => ({
         map: { ...state.map, ...preferences }
@@ -40,6 +57,14 @@ export const usePreferencesStore = create<PreferencesState>()(
       
       resetMapPreferences: () => set(() => ({
         map: { ...DEFAULT_MAP_PREFERENCES }
+      })),
+      
+      updateUnitPreferences: (preferences) => set((state) => ({
+        units: { ...state.units, ...preferences }
+      })),
+      
+      resetUnitPreferences: () => set(() => ({
+        units: { ...DEFAULT_UNIT_PREFERENCES }
       }))
     }),
     {

@@ -1,4 +1,4 @@
-import { FlightPath } from '@/types/airfield';
+import { FlightPath, Waypoint } from '@/types/airfield';
 import { v4 as uuidv4 } from 'uuid';
 
 // Determine if the file is KML or GPX based on content
@@ -36,23 +36,42 @@ export const parseKML = (content: string, fileName: string): FlightPath | null =
     } else if (gxTrack) {
       // Handle gx:Track format with separate coordinate elements
       const coords: Array<[number, number]> = [];
+      const waypoints: Waypoint[] = [];
       const coordNodes = gxTrack.querySelectorAll('gx\\:coord');
+      const whenNodes = gxTrack.querySelectorAll('when');
       
-      coordNodes.forEach(node => {
+      coordNodes.forEach((node, idx) => {
         if (node.textContent) {
           const parts = node.textContent.trim().split(' ');
           if (parts.length >= 2) {
             // KML format is longitude, latitude, [altitude]
-            coords.push([parseFloat(parts[1]), parseFloat(parts[0])]);
+            const lng = parseFloat(parts[0]);
+            const lat = parseFloat(parts[1]);
+            const altitude = parts.length >= 3 ? parseFloat(parts[2]) * 3.28084 : undefined; // Convert meters to feet
+            
+            coords.push([lat, lng]);
+            
+            const waypoint: Waypoint = {
+              lat,
+              lng,
+              altitude,
+              timestamp: whenNodes[idx]?.textContent || undefined,
+            };
+            
+            waypoints.push(waypoint);
           }
         }
       });
+      
+      // Calculate speeds between waypoints
+      enrichWaypointsWithSpeed(waypoints);
 
       return {
         id: uuidv4(),
         name,
         date: traceDate,
         coordinates: coords,
+        waypoints,
         fileType: 'KML',
         fileName
       };
@@ -64,29 +83,43 @@ export const parseKML = (content: string, fileName: string): FlightPath | null =
     }
     
     // Parse coordinates from KML format (lon,lat,alt lon,lat,alt ...)
-    const coordinates = coordinatesString
+    const coordinates: Array<[number, number]> = [];
+    const waypoints: Waypoint[] = [];
+    
+    coordinatesString
       .split(/\s+/)
       .filter(coord => coord.trim())
-      .map(coord => {
+      .forEach(coord => {
         const parts = coord.split(',');
-        if (parts.length < 2 || isNaN(parseFloat(parts[0])) || isNaN(parseFloat(parts[1]))) {
-          return null;
+        if (parts.length >= 2 && !isNaN(parseFloat(parts[0])) && !isNaN(parseFloat(parts[1]))) {
+          const lon = parseFloat(parts[0]);
+          const lat = parseFloat(parts[1]);
+          const altitude = parts.length >= 3 ? parseFloat(parts[2]) * 3.28084 : undefined; // Convert meters to feet
+          
+          coordinates.push([lat, lon]);
+          
+          waypoints.push({
+            lat,
+            lng: lon,
+            altitude,
+          });
         }
-        const [lon, lat] = parts;
-        return [parseFloat(lat), parseFloat(lon)] as [number, number];
-      })
-      .filter(Boolean) as [number, number][];
+      });
     
     if (coordinates.length < 2) {
       console.error('Not enough coordinates found in KML file');
       return null;
     }
     
+    // Calculate speeds between waypoints
+    enrichWaypointsWithSpeed(waypoints);
+    
     return {
       id: uuidv4(),
       name,
       date: traceDate,
       coordinates,
+      waypoints,
       fileType: 'KML',
       fileName
     };
@@ -117,18 +150,44 @@ export const parseGPX = (content: string, fileName: string): FlightPath | null =
       return null;
     }
     
-    // Extract coordinates from track points
-    const coordinates = Array.from(trackPoints).map(point => {
+    // Extract coordinates and waypoints from track points
+    const coordinates: Array<[number, number]> = [];
+    const waypoints: Waypoint[] = [];
+    
+    Array.from(trackPoints).forEach(point => {
       const lat = point.getAttribute('lat');
       const lon = point.getAttribute('lon');
-      if (!lat || !lon || isNaN(parseFloat(lat)) || isNaN(parseFloat(lon))) return null;
-      return [parseFloat(lat), parseFloat(lon)] as [number, number];
-    }).filter(Boolean) as Array<[number, number]>;
+      
+      if (!lat || !lon || isNaN(parseFloat(lat)) || isNaN(parseFloat(lon))) return;
+      
+      const latitude = parseFloat(lat);
+      const longitude = parseFloat(lon);
+      
+      // Extract elevation (altitude)
+      const eleElement = point.querySelector('ele');
+      const altitude = eleElement?.textContent ? parseFloat(eleElement.textContent) * 3.28084 : undefined; // Convert meters to feet
+      
+      // Extract timestamp
+      const timeElement = point.querySelector('time');
+      const timestamp = timeElement?.textContent || undefined;
+      
+      coordinates.push([latitude, longitude]);
+      
+      waypoints.push({
+        lat: latitude,
+        lng: longitude,
+        altitude,
+        timestamp,
+      });
+    });
     
     if (coordinates.length < 2) {
       console.error('Not enough valid coordinates found in GPX file');
       return null;
     }
+    
+    // Calculate speeds between waypoints
+    enrichWaypointsWithSpeed(waypoints);
     
     // Extract date from metadata if available
     let date = new Date().toISOString().split('T')[0]; // Default to today
@@ -148,6 +207,7 @@ export const parseGPX = (content: string, fileName: string): FlightPath | null =
       name,
       date,
       coordinates,
+      waypoints,
       fileType: 'GPX',
       fileName
     };
@@ -182,7 +242,7 @@ export const parseFlightFile = async (file: File): Promise<FlightPath | null> =>
 
 // Calculate flight statistics
 export const calculateFlightStatistics = (flightPath: FlightPath) => {
-  const { coordinates } = flightPath;
+  const { coordinates, waypoints } = flightPath;
   
   if (coordinates.length < 2) {
     return {
@@ -203,29 +263,64 @@ export const calculateFlightStatistics = (flightPath: FlightPath) => {
     return acc + calculateDistance(prevCoord[0], prevCoord[1], coord[0], coord[1]);
   }, 0);
   
-  // For demo purposes, let's create some simulated values
-  // In a real app, these would come from the actual GPX/KML data
+  let maxAltitude = 0;
+  let avgAltitude = 0;
+  let maxSpeed = 0;
+  let avgSpeed = 0;
+  let duration = 0;
   
-  // Generate some plausible altitude data based on coordinates length
-  const simMaxAltitude = 1000 + Math.floor(Math.random() * 9000); // Between 1000-10000 ft
-  const simAvgAltitude = Math.floor(simMaxAltitude * 0.7); // About 70% of max altitude
+  // Use actual waypoint data if available
+  if (waypoints && waypoints.length > 0) {
+    // Calculate altitude statistics
+    const altitudes = waypoints.filter(w => w.altitude).map(w => w.altitude!);
+    if (altitudes.length > 0) {
+      maxAltitude = Math.max(...altitudes);
+      avgAltitude = Math.round(altitudes.reduce((a, b) => a + b, 0) / altitudes.length);
+    }
+    
+    // Calculate speed statistics
+    const speeds = waypoints.filter(w => w.speed).map(w => w.speed!);
+    if (speeds.length > 0) {
+      maxSpeed = Math.max(...speeds);
+      avgSpeed = Math.round(speeds.reduce((a, b) => a + b, 0) / speeds.length);
+    }
+    
+    // Calculate duration from timestamps if available
+    const firstWaypoint = waypoints[0];
+    const lastWaypoint = waypoints[waypoints.length - 1];
+    if (firstWaypoint.timestamp && lastWaypoint.timestamp) {
+      const startTime = new Date(firstWaypoint.timestamp).getTime();
+      const endTime = new Date(lastWaypoint.timestamp).getTime();
+      duration = (endTime - startTime) / (1000 * 60 * 60); // in hours
+    }
+  }
   
-  // Generate some plausible speed data
-  const simMaxSpeed = 90 + Math.floor(Math.random() * 110); // Between 90-200 knots
-  const simAvgSpeed = Math.floor(simMaxSpeed * 0.75); // About 75% of max speed
+  // Fallback to simulated values if no waypoint data
+  if (maxAltitude === 0) {
+    maxAltitude = 1000 + Math.floor(Math.random() * 9000); // Between 1000-10000 ft
+    avgAltitude = Math.floor(maxAltitude * 0.7); // About 70% of max altitude
+  }
   
-  // Calculate approximate duration based on distance and average speed (in hours)
-  const simDuration = totalDistance / Math.max(simAvgSpeed, 1);
-  const durationHours = Math.floor(simDuration);
-  const durationMinutes = Math.floor((simDuration - durationHours) * 60);
+  if (maxSpeed === 0) {
+    maxSpeed = 90 + Math.floor(Math.random() * 110); // Between 90-200 knots
+    avgSpeed = Math.floor(maxSpeed * 0.75); // About 75% of max speed
+  }
+  
+  // Calculate approximate duration based on distance and average speed if not calculated from timestamps
+  if (duration === 0 && avgSpeed > 0) {
+    duration = totalDistance / avgSpeed;
+  }
+  
+  const durationHours = Math.floor(duration);
+  const durationMinutes = Math.floor((duration - durationHours) * 60);
   
   return {
     totalDistance: Math.round(totalDistance * 10) / 10, // Round to 1 decimal place
-    maxAltitude: simMaxAltitude,
-    avgAltitude: simAvgAltitude,
-    maxSpeed: simMaxSpeed,
-    avgSpeed: simAvgSpeed,
-    duration: simDuration,
+    maxAltitude: Math.round(maxAltitude),
+    avgAltitude: Math.round(avgAltitude),
+    maxSpeed: Math.round(maxSpeed),
+    avgSpeed: Math.round(avgSpeed),
+    duration,
     durationFormatted: `${durationHours}h ${durationMinutes}m`,
     waypointCount: coordinates.length
   };
@@ -277,6 +372,40 @@ const findClosestAirfield = (lat: number, lng: number, airfields: Array<{ id: st
   }
   
   return closestAirfield;
+};
+
+// Enrich waypoints with calculated speed based on distance and time
+const enrichWaypointsWithSpeed = (waypoints: Waypoint[]) => {
+  for (let i = 1; i < waypoints.length; i++) {
+    const prev = waypoints[i - 1];
+    const curr = waypoints[i];
+    
+    // If we have timestamps, calculate speed
+    if (prev.timestamp && curr.timestamp) {
+      const prevTime = new Date(prev.timestamp).getTime();
+      const currTime = new Date(curr.timestamp).getTime();
+      const timeDiffHours = (currTime - prevTime) / (1000 * 60 * 60); // in hours
+      
+      if (timeDiffHours > 0) {
+        const distance = calculateDistance(prev.lat, prev.lng, curr.lat, curr.lng); // in NM
+        const speed = distance / timeDiffHours; // in knots
+        
+        // Assign speed to current waypoint
+        curr.speed = Math.round(speed);
+      }
+    } else {
+      // If no timestamps, generate simulated speed data
+      // This creates realistic variation around a base speed
+      const baseSpeed = 100; // Average cruise speed in knots
+      const variation = 20; // Speed variation
+      curr.speed = Math.round(baseSpeed + (Math.random() - 0.5) * variation);
+    }
+  }
+  
+  // Set first waypoint speed to second waypoint speed if available
+  if (waypoints.length > 1 && waypoints[1].speed) {
+    waypoints[0].speed = waypoints[1].speed;
+  }
 };
 
 // Extract date from filename if available

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from '@/components/ui/label';
-import { usePreferencesStore, MapPreferences } from '@/store/preferences-store';
+import { usePreferencesStore, MapPreferences, UnitPreferences } from '@/store/preferences-store';
 import { Settings } from 'lucide-react';
 
 interface PreferencesDialogProps {
@@ -45,19 +45,29 @@ const colorOptions: ColorOption[] = [
 
 const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
   const { t } = useTranslation();
-  const { map: mapPreferences, updateMapPreferences, resetMapPreferences } = usePreferencesStore();
+  const { 
+    map: mapPreferences, 
+    units: unitPreferences,
+    updateMapPreferences, 
+    resetMapPreferences,
+    updateUnitPreferences,
+    resetUnitPreferences
+  } = usePreferencesStore();
 
   // Local state for preferences that will only be applied when saved
   const [localPreferences, setLocalPreferences] = useState<MapPreferences>(mapPreferences);
+  const [localUnitPreferences, setLocalUnitPreferences] = useState<UnitPreferences>(unitPreferences);
   const [open, setOpen] = useState(false);
 
   const handleSave = () => {
     updateMapPreferences(localPreferences);
+    updateUnitPreferences(localUnitPreferences);
     setOpen(false);
   };
 
   const handleReset = () => {
     resetMapPreferences();
+    resetUnitPreferences();
     setLocalPreferences({
       flightPathColor: '#d53f94',
       selectedFlightPathColor: '#ff0000',
@@ -67,12 +77,17 @@ const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
       fadeOtherFlightPaths: true,
       otherFlightPathsOpacity: 0.3
     });
+    setLocalUnitPreferences({
+      distance: 'nm',
+      speed: 'kt'
+    });
   };
 
   // Update local preferences when dialog opens
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
       setLocalPreferences(mapPreferences);
+      setLocalUnitPreferences(unitPreferences);
     }
     setOpen(isOpen);
   };
@@ -92,14 +107,60 @@ const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[475px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('preferences.title')}</DialogTitle>
         </DialogHeader>
         
         <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-3 items-center gap-4">
-            <Label htmlFor="flightPathColor" className="text-right">
+          {/* Units Section */}
+          <div className="border-b pb-4">
+            <h4 className="text-sm font-medium mb-3">{t('preferences.units.title')}</h4>
+            
+            <div className="grid grid-cols-3 items-center gap-4 mb-3">
+              <Label htmlFor="distanceUnit" className="text-right text-sm">
+                {t('preferences.units.distance')}
+              </Label>
+              <Select 
+                value={localUnitPreferences.distance} 
+                onValueChange={(value) => setLocalUnitPreferences({...localUnitPreferences, distance: value as any})}
+              >
+                <SelectTrigger className="col-span-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="nm">{t('preferences.units.nm')}</SelectItem>
+                  <SelectItem value="km">{t('preferences.units.km')}</SelectItem>
+                  <SelectItem value="mi">{t('preferences.units.mi')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid grid-cols-3 items-center gap-4">
+              <Label htmlFor="speedUnit" className="text-right text-sm">
+                {t('preferences.units.speed')}
+              </Label>
+              <Select 
+                value={localUnitPreferences.speed} 
+                onValueChange={(value) => setLocalUnitPreferences({...localUnitPreferences, speed: value as any})}
+              >
+                <SelectTrigger className="col-span-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="kt">{t('preferences.units.kt')}</SelectItem>
+                  <SelectItem value="kmh">{t('preferences.units.kmh')}</SelectItem>
+                  <SelectItem value="mph">{t('preferences.units.mph')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          {/* Map Section */}
+          <div className="border-b pb-4">
+            <h4 className="text-sm font-medium mb-3">{t('preferences.map.title')}</h4>
+            <div className="grid grid-cols-3 items-center gap-4">
+              <Label htmlFor="flightPathColor" className="text-right">
               {t('preferences.flightPathColor')}
             </Label>
             <Select 
@@ -133,8 +194,8 @@ const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
             </Select>
           </div>
           
-          <div className="grid grid-cols-3 items-center gap-4">
-            <Label htmlFor="flightPathWidth" className="text-right">
+            <div className="grid grid-cols-3 items-center gap-4">
+              <Label htmlFor="flightPathWidth" className="text-right">
               {t('preferences.flightPathWidth')}
             </Label>
             <div className="col-span-2 flex items-center gap-4">
@@ -148,12 +209,12 @@ const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
                 onValueChange={(values) => setLocalPreferences({...localPreferences, flightPathWidth: values[0]})}
                 className="flex-1"
               />
-              <span className="w-8 text-center">{localPreferences.flightPathWidth}</span>
+                <span className="w-8 text-center">{localPreferences.flightPathWidth}</span>
+              </div>
             </div>
-          </div>
           
-          <div className="grid grid-cols-3 items-center gap-4">
-            <Label htmlFor="selectedFlightPathWidth" className="text-right">
+            <div className="grid grid-cols-3 items-center gap-4">
+              <Label htmlFor="selectedFlightPathWidth" className="text-right">
               {t('preferences.selectedPathWidth')}
             </Label>
             <div className="col-span-2 flex items-center gap-4">
@@ -167,7 +228,8 @@ const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
                 onValueChange={(values) => setLocalPreferences({...localPreferences, selectedFlightPathWidth: values[0]})}
                 className="flex-1"
               />
-              <span className="w-8 text-center">{localPreferences.selectedFlightPathWidth}</span>
+                <span className="w-8 text-center">{localPreferences.selectedFlightPathWidth}</span>
+              </div>
             </div>
           </div>
           

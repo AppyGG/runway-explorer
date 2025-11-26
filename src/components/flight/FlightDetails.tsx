@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAirfieldStore } from '@/store/airfield-store';
 import { FlightPath } from '@/types/airfield';
 import { Button } from '@/components/ui/button';
+import FlightProfileChart from './FlightProfileChart';
 import { 
   Card, 
   CardContent, 
@@ -36,6 +37,9 @@ import {
 import { calculateFlightStatistics } from '@/lib/flight-parser';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { usePreferencesStore } from '@/store/preferences-store';
+import { formatDistance, formatSpeed } from '@/lib/unit-conversion';
+import { useTranslation } from 'react-i18next';
 
 interface FlightDetailsProps {
   flight: FlightPath | null;
@@ -55,6 +59,8 @@ const FlightDetails = ({
   const { airfields, deleteFlightPath } = useAirfieldStore();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { t } = useTranslation();
+  const { units } = usePreferencesStore();
   const [sheetOpen, setSheetOpen] = useState(false);
   
   useEffect(() => {
@@ -170,11 +176,11 @@ const FlightDetails = ({
             <CardHeader className="py-3">
               <CardTitle className="text-sm font-medium flex items-center gap-1.5">
                 <Ruler className="h-4 w-4 text-primary" />
-                Distance
+                {t('flights.distance')}
               </CardTitle>
             </CardHeader>
             <CardContent className="py-0">
-              <div className="text-2xl font-bold">{stats.totalDistance} NM</div>
+              <div className="text-2xl font-bold">{formatDistance(stats.totalDistance, units.distance)}</div>
             </CardContent>
           </Card>
           
@@ -244,7 +250,7 @@ const FlightDetails = ({
                       Max Altitude
                     </div>
                     <div className="text-lg font-semibold">
-                      {stats.maxAltitude} ft
+                      {stats.maxAltitude} {t('units.ft')}
                     </div>
                   </div>
                 </CardContent>
@@ -260,7 +266,7 @@ const FlightDetails = ({
                       Avg Altitude
                     </div>
                     <div className="text-lg font-semibold">
-                      {stats.avgAltitude} ft
+                      {stats.avgAltitude} {t('units.ft')}
                     </div>
                   </div>
                 </CardContent>
@@ -276,7 +282,7 @@ const FlightDetails = ({
                       Max Speed
                     </div>
                     <div className="text-lg font-semibold">
-                      {stats.maxSpeed} kt
+                      {formatSpeed(stats.maxSpeed, units.speed)}
                     </div>
                   </div>
                 </CardContent>
@@ -284,6 +290,11 @@ const FlightDetails = ({
             )}
           </div>
         </div>
+        
+        {/* Flight Profile Chart */}
+        {flight.waypoints && flight.waypoints.length > 0 && (
+          <FlightProfileChart flight={flight} />
+        )}
         
         <div>
           <h3 className="text-lg font-semibold mb-2">Route Details</h3>
