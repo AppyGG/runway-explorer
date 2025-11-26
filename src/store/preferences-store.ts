@@ -13,12 +13,10 @@ export interface MapPreferences {
 
 export interface PreferencesState {
   map: MapPreferences;
-  openAipToken: string;
 
   // Actions
   updateMapPreferences: (preferences: Partial<MapPreferences>) => void;
   resetMapPreferences: () => void;
-  updateOpenAipToken: (token: string) => void;
 }
 
 const DEFAULT_MAP_PREFERENCES: MapPreferences = {

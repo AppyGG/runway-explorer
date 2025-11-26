@@ -42,9 +42,16 @@ interface FlightDetailsProps {
   onClose?: () => void;
   isSheet?: boolean;
   className?: string;
+  readOnly?: boolean; // Read-only mode for shared view
 }
 
-const FlightDetails = ({ flight, onClose, isSheet = false, className = '' }: FlightDetailsProps) => {
+const FlightDetails = ({
+   flight, 
+   onClose,
+   isSheet = false,
+   className = '',
+   readOnly = false
+}: FlightDetailsProps) => {
   const { airfields, deleteFlightPath } = useAirfieldStore();
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -316,10 +323,12 @@ const FlightDetails = ({ flight, onClose, isSheet = false, className = '' }: Fli
               <Download className="h-4 w-4 mr-1" />
               Export GPX
             </Button>
+          {!readOnly && (
             <Button variant="destructive" onClick={handleDeleteFlight}>
-              <TrashIcon className="h-4 w-4 mr-1" />
-              Delete Flight
-            </Button>
+                <TrashIcon className="h-4 w-4 mr-1" />
+                Delete Flight
+              </Button>
+          )}
           </div>
         </div>
       </div>

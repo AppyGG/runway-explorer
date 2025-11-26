@@ -1,13 +1,15 @@
 {
-  "name": "vite-project",
+  "name": "runway-explorer",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:full": "bash start-dev.sh",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "backend": "cd backend-example && npm start"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

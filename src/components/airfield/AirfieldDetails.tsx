@@ -41,9 +41,16 @@ interface AirfieldDetailsProps {
   onClose?: () => void;
   isSheet?: boolean;
   className?: string;
+  readOnly?: boolean; // Read-only mode for shared view
 }
 
-const AirfieldDetails = ({ airfield, onClose, isSheet = false, className = '' }: AirfieldDetailsProps) => {
+const AirfieldDetails = ({ 
+  airfield,
+  onClose,
+  isSheet = false,
+  className = '',
+  readOnly = false
+}: AirfieldDetailsProps) => {
   const { updateAirfield, deleteAirfield, setHomeAirfield, homeAirfieldId, flightPaths } = useAirfieldStore();
   const { toast } = useToast();
   const isMobile = useIsMobile();

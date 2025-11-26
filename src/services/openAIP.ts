@@ -6,9 +6,8 @@
 import { Airfield } from '@/types/airfield';
 import { v4 as uuidv4 } from 'uuid';
 
-// API endpoints
-const API_BASE_URL = import.meta.env.OPENAIP_URL;
-const API_KEY = import.meta.env.OPENAIP_API_KEY;
+// Backend API endpoint
+const BACKEND_API_URL = import.meta.env.BACKEND_URL || 'http://localhost:3008';
 
 // OpenAIP response types
 interface OpenAIPAirport {
@@ -90,13 +89,20 @@ export const searchAirfields = async (
   limit: number = 10
 ): Promise<Airfield[]> => {
   try {
-    // If we implemented the actual API call, it would look something like:
-    const response = await fetch(`${API_BASE_URL}/airports??page=1&limit=${limit}&search=${encodeURIComponent(searchTerm)}`, {
-       headers: {
-         'x-openaip-api-key': `${API_KEY}`,
-         'Content-Type': 'application/json'
-       }
-     });
+    // Call our backend instead of OpenAIP directly
+    const response = await fetch(
+      `${BACKEND_API_URL}/api/airports/search?q=${encodeURIComponent(searchTerm)}&limit=${limit}`,
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Backend API returned status ${response.status}`);
+    }
+
     const data = await response.json();
 
     // Convert the OpenAIP format to our Airfield format
