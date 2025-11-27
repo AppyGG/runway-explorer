@@ -94,7 +94,7 @@ const FlightList = ({
       </CardHeader>
       <CardContent className="flex-grow pb-0 overflow-hidden">
         {filteredFlights.length > 0 ? (
-          <ScrollArea className="max-h-[calc(100%-1rem)] pr-3 overflow-hidden">
+          <ScrollArea className="max-h-[calc(100%-1rem)] overflow-hidden">
             <div className="space-y-3">
               {filteredFlights.map(flight => {
                 const stats = calculateFlightStatistics(flight);
@@ -104,45 +104,33 @@ const FlightList = ({
                     className="cursor-pointer hover:bg-accent transition-colors"
                     onClick={() => handleSelectFlight(flight)}
                   >
-                    <CardHeader className="p-3 pb-2">
+                    <div className="flex justify-between items-center p-3 pb-2">
                       <CardTitle className="text-base">{flight.name}</CardTitle>
-                      <CardDescription className="flex items-center gap-1">
-                        <CalendarIcon className="h-3.5 w-3.5" /> {flight.date}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="px-3 py-0 text-sm">
-                      {flight.departure && (
-                        <div className="flex items-center gap-1 mb-1 text-muted-foreground">
-                          <ArrowUpRight className="h-3.5 w-3.5" />
-                          From: {getAirfieldName(flight.departure)}
-                        </div>
-                      )}
-                      {flight.arrival && (
-                        <div className="flex items-center gap-1 mb-1 text-muted-foreground">
-                          <ArrowDownRight className="h-3.5 w-3.5" />
-                          To: {getAirfieldName(flight.arrival)}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <MapPin className="h-3.5 w-3.5" />
-                        {t('flights.distance')}: {formatDistance(stats.totalDistance, units.distance)}
-                      </div>
-                    </CardContent>
-                    <CardFooter className="p-3 pt-2 flex justify-between">
                       <span className="text-xs text-muted-foreground">
                         {flight.fileType} file
                       </span>
-                      {!readOnly && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                          onClick={(e) => handleDeleteFlight(e, flight.id)}
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </CardFooter>
+                    </div>
+                    <div className="px-3 grid grid-flow-col grid-rows-2 gap1">
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <CalendarIcon className="h-3.5 w-3.5" /> {flight.date}
+                        </div>
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <MapPin className="h-3.5 w-3.5" />
+                          {t('flights.distance')}: {formatDistance(stats.totalDistance, units.distance)}
+                        </div>
+                        {flight.departure && (
+                          <div className="flex items-center gap-1 mb-1 text-muted-foreground">
+                            <ArrowUpRight className="h-3.5 w-3.5" />
+                            From: {getAirfieldName(flight.departure)}
+                          </div>
+                        )}
+                        {flight.arrival && (
+                          <div className="flex items-center gap-1 mb-1 text-muted-foreground">
+                            <ArrowDownRight className="h-3.5 w-3.5" />
+                            To: {getAirfieldName(flight.arrival)}
+                          </div>
+                        )}
+                    </div>
                   </Card>
                 );
               })}

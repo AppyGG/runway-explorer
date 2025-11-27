@@ -26,13 +26,15 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Ruler,
-  Clock,
+  Gauge,
   ChevronLeft,
   TrashIcon,
   Download,
-  CloudSun,
   Mountain,
-  Route
+  Clock,
+  Edit2,
+  Check,
+  X
 } from 'lucide-react';
 import { calculateFlightStatistics } from '@/lib/flight-parser';
 import { useToast } from '@/hooks/use-toast';
@@ -40,6 +42,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { usePreferencesStore } from '@/store/preferences-store';
 import { formatDistance, formatSpeed } from '@/lib/unit-conversion';
 import { useTranslation } from 'react-i18next';
+import { Input } from '@/components/ui/input';
 
 interface FlightDetailsProps {
   flight: FlightPath | null;
@@ -56,15 +59,21 @@ const FlightDetails = ({
    className = '',
    readOnly = false
 }: FlightDetailsProps) => {
-  const { airfields, deleteFlightPath } = useAirfieldStore();
+  const { airfields, deleteFlightPath, updateFlightPath } = useAirfieldStore();
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { t } = useTranslation();
   const { units } = usePreferencesStore();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState('');
   
   useEffect(() => {
     setSheetOpen(!!flight && isSheet);
+    if (flight) {
+      setEditedName(flight.name);
+      setIsEditingName(false);
+    }
   }, [flight, isSheet]);
   
   // Handle sheet close
@@ -93,6 +102,32 @@ const FlightDetails = ({
     ? airfields.find(a => a.id === flight.arrival)
     : undefined;
   
+  // Handle name edit
+  const handleStartEdit = () => {
+    if (readOnly) return;
+    setIsEditingName(true);
+  };
+
+  const handleSaveName = () => {
+    if (!flight || !editedName.trim()) return;
+    
+    updateFlightPath(flight.id, { name: editedName.trim() });
+    
+    toast({
+      title: t('flights.nameUpdated.title'),
+      description: t('flights.nameUpdated.description')
+    });
+    
+    setIsEditingName(false);
+  };
+
+  const handleCancelEdit = () => {
+    if (flight) {
+      setEditedName(flight.name);
+    }
+    setIsEditingName(false);
+  };
+
   // Handle flight deletion
   const handleDeleteFlight = () => {
     if (!flight) return;
@@ -100,8 +135,8 @@ const FlightDetails = ({
     deleteFlightPath(flight.id);
     
     toast({
-      title: "Flight deleted",
-      description: `${flight.name} has been deleted.`
+      title: t('flights.deleted.title'),
+      description: t('flights.deleted.description', { name: flight.name })
     });
     
     if (onClose) onClose();
@@ -231,11 +266,11 @@ const FlightDetails = ({
               <CardContent className="p-3">
                 <div className="flex flex-col">
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
-                    <Route className="h-4 w-4" />
-                    Waypoints
+                    <Clock className="h-4 w-4" />
+                    Duration
                   </div>
                   <div className="text-lg font-semibold">
-                    {flight?.coordinates.length || 0}
+                    {stats?.durationFormatted}
                   </div>
                 </div>
               </CardContent>
@@ -262,7 +297,7 @@ const FlightDetails = ({
                 <CardContent className="p-3">
                   <div className="flex flex-col">
                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
-                      <CloudSun className="h-4 w-4" />
+                      <Plane className="h-4 w-4" />
                       Avg Altitude
                     </div>
                     <div className="text-lg font-semibold">
@@ -278,7 +313,7 @@ const FlightDetails = ({
                 <CardContent className="p-3">
                   <div className="flex flex-col">
                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
-                      <Plane className="h-4 w-4" />
+                      <Gauge className="h-4 w-4" />
                       Max Speed
                     </div>
                     <div className="text-lg font-semibold">
@@ -357,9 +392,37 @@ const FlightDetails = ({
       <Sheet open={sheetOpen} onOpenChange={(open) => !open && handleSheetClose()}>
         <SheetContent side="bottom" className="h-[85vh]">
           <SheetHeader className="mb-4">
-            <SheetTitle>{flight?.name}</SheetTitle>
+            {flight && isEditingName ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSaveName();
+                    if (e.key === 'Escape') handleCancelEdit();
+                  }}
+                  className="text-lg font-semibold"
+                  autoFocus
+                />
+                <Button size="icon" variant="ghost" onClick={handleSaveName}>
+                  <Check className="h-4 w-4" />
+                </Button>
+                <Button size="icon" variant="ghost" onClick={handleCancelEdit}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <SheetTitle>{flight?.name}</SheetTitle>
+                {!readOnly && flight && (
+                  <Button size="icon" variant="ghost" onClick={handleStartEdit}>
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            )}
             <SheetDescription>
-              Flight details and statistics
+              {t('flights.details')}
             </SheetDescription>
           </SheetHeader>
           {content}
@@ -373,17 +436,44 @@ const FlightDetails = ({
     <Card className={`h-full flex flex-col ${className}`}>
       <CardHeader>
         <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <Plane className="h-5 w-5 text-primary" />
-              {flight ? flight.name : 'Flight Details'}
-            </CardTitle>
+          <div className="flex-1 min-w-0">
+            {flight && isEditingName ? (
+              <div className="flex items-center gap-2 mb-2">
+                <Plane className="h-5 w-5 text-primary flex-shrink-0" />
+                <Input
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSaveName();
+                    if (e.key === 'Escape') handleCancelEdit();
+                  }}
+                  className="text-xl font-semibold h-auto py-1"
+                  autoFocus
+                />
+                <Button size="icon" variant="ghost" onClick={handleSaveName}>
+                  <Check className="h-4 w-4" />
+                </Button>
+                <Button size="icon" variant="ghost" onClick={handleCancelEdit}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <CardTitle className="flex items-center gap-2">
+                <Plane className="h-5 w-5 text-primary" />
+                <span className="truncate">{flight ? flight.name : t('flights.details')}</span>
+                {!readOnly && flight && (
+                  <Button size="icon" variant="ghost" className="h-8 w-8 flex-shrink-0" onClick={handleStartEdit}>
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </CardTitle>
+            )}
             <CardDescription>
-              {flight ? 'Flight details and statistics' : 'Select a flight from the list'}
+              {flight ? t('flights.details') : t('flights.selectFlight')}
             </CardDescription>
           </div>
           {flight && (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs ml-2 flex-shrink-0">
               {flight.fileType}
             </Badge>
           )}

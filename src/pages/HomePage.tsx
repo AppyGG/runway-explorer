@@ -8,7 +8,8 @@ import {
   FileSymlink,
   CircleHelp,
   Route,
-  TowerControl
+  TowerControl,
+  BarChart3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -22,6 +23,7 @@ import FlightList from '@/components/flight/FlightList';
 import FlightDetails from '@/components/flight/FlightDetails';
 import FlightUploadDialog from '@/components/flight/FlightUploadDialog';
 import ShareDialog from '@/components/share/ShareDialog';
+import Statistics from '@/components/statistics/Statistics';
 import { Airfield, FlightPath } from '@/types/airfield';
 import { useAirfieldStore } from '@/store/airfield-store';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -93,8 +95,8 @@ function HomePage() {
           onValueChange={setActiveTab} 
           className="flex-1 flex flex-col"
         >
-          <div className="bg-muted/50 p-2 border-b">
-            <TabsList className="w-full grid grid-cols-3">
+          <div className="bg-muted/50 p-2 border-b overflow-x-auto">
+            <TabsList className="w-full grid grid-cols-4 min-w-[400px]">
               <TabsTrigger value="map" className="flex items-center gap-1">
                 <MapIcon className="h-4 w-4" /> {t('map.title')}
               </TabsTrigger>
@@ -103,6 +105,9 @@ function HomePage() {
               </TabsTrigger>
               <TabsTrigger value="flights" className="flex items-center gap-1">
                 <Plane className="h-4 w-4" /> {t('flights.title')}
+              </TabsTrigger>
+              <TabsTrigger value="statistics" className="flex items-center gap-1">
+                <BarChart3 className="h-4 w-4" /> {t('statistics.title')}
               </TabsTrigger>
             </TabsList>
           </div>
@@ -164,6 +169,12 @@ function HomePage() {
               />
             </div>
           </TabsContent>
+          
+          <TabsContent value="statistics" className="flex-1 p-0 m-0">
+            <div className="h-full p-2">
+              <Statistics className="h-full" />
+            </div>
+          </TabsContent>
         </Tabs>
       ) : (
         // Desktop view with side-by-side panels
@@ -178,12 +189,15 @@ function HomePage() {
           </div>
           <div className="col-span-1 h-[calc(100vh-100px)]">
             <Tabs defaultValue="airfields" className="h-full flex flex-col">
-              <TabsList className="w-full grid grid-cols-2">
+              <TabsList className="w-full grid grid-cols-3">
                 <TabsTrigger value="airfields" className="flex items-center gap-1">
                   <TowerControl className="h-4 w-4" /> {t('airfields.title')}
                 </TabsTrigger>
                 <TabsTrigger value="flights" className="flex items-center gap-1">
                   <Plane className="h-4 w-4" /> {t('flights.title')}
+                </TabsTrigger>
+                <TabsTrigger value="statistics" className="flex items-center gap-1">
+                  <BarChart3 className="h-4 w-4" /> {t('statistics.title')}
                 </TabsTrigger>
               </TabsList>
               
@@ -221,6 +235,10 @@ function HomePage() {
                     />
                   </div>
                 )}
+              </TabsContent>
+              
+              <TabsContent value="statistics" className="flex-1 p-0 m-0 mt-2">
+                <Statistics className="h-full" />
               </TabsContent>
             </Tabs>
           </div>

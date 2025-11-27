@@ -18,6 +18,7 @@ interface AirfieldState {
   
   // Flight paths
   addFlightPath: (flightPath: Omit<FlightPath, 'id'>) => void;
+  updateFlightPath: (id: string, updates: Partial<FlightPath>) => void;
   deleteFlightPath: (id: string) => void;
 }
 
@@ -61,6 +62,12 @@ export const useAirfieldStore = create<AirfieldState>()(
       
       addFlightPath: (flightPath) => set((state) => ({
         flightPaths: [...state.flightPaths, { ...flightPath, id: uuidv4() }]
+      })),
+      
+      updateFlightPath: (id, updates) => set((state) => ({
+        flightPaths: state.flightPaths.map(flightPath => 
+          flightPath.id === id ? { ...flightPath, ...updates } : flightPath
+        )
       })),
       
       deleteFlightPath: (id) => set((state) => ({
