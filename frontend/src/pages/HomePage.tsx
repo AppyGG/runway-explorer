@@ -12,9 +12,7 @@ import {
   BarChart3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import LanguageSelector from '@/components/LanguageSelector';
 import PreferencesDialog from '@/components/preferences/PreferencesDialog';
 import MapView from '@/components/map/MapView';
 import AirfieldList from '@/components/airfield/AirfieldList';
@@ -77,11 +75,6 @@ function HomePage() {
             onUploadComplete={handleFlightUploadComplete}
           />
           <ShareDialog />
-          <LanguageSelector />
-          {/* <Button variant="ghost" size="icon">
-            <Settings className="h-4 w-4" />
-          </Button> */}
-          <ThemeToggle />
           <PreferencesDialog />
         </div>
       </header>

@@ -12,6 +12,9 @@ export interface MapPreferences {
   hideOtherFlightPaths: boolean; // Hide other flight paths when one is selected
   fadeOtherFlightPaths: boolean; // Fade other flight paths when one is selected (if hideOtherFlightPaths is false)
   otherFlightPathsOpacity: number; // Opacity of other flight paths when faded (0-1)
+  showHeatmap: boolean; // Show heatmap of flight paths
+  heatmapIntensity: number; // Heatmap intensity (0-1)
+  heatmapRadius: number; // Heatmap point radius in pixels
 }
 
 export interface UnitPreferences {
@@ -37,7 +40,10 @@ const DEFAULT_MAP_PREFERENCES: MapPreferences = {
   selectedFlightPathWidth: 4,
   hideOtherFlightPaths: false,
   fadeOtherFlightPaths: true,
-  otherFlightPathsOpacity: 0.3
+  otherFlightPathsOpacity: 0.3,
+  showHeatmap: false,
+  heatmapIntensity: 0.5,
+  heatmapRadius: 15
 };
 
 const DEFAULT_UNIT_PREFERENCES: UnitPreferences = {

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/hooks/use-theme';
 import { 
   Dialog, 
   DialogContent, 
@@ -21,30 +22,27 @@ import {
 } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from '@/components/ui/label';
+import { ColorPicker } from '@/components/ui/color-picker';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { usePreferencesStore, MapPreferences, UnitPreferences } from '@/store/preferences-store';
-import { Settings } from 'lucide-react';
+import { Settings, Moon, Sun, Monitor } from 'lucide-react';
 
 interface PreferencesDialogProps {
   trigger?: React.ReactNode;
 }
 
-interface ColorOption {
-  value: string;
-  label: string;
-  translateKey: string;
-}
-
-const colorOptions: ColorOption[] = [
-  { value: '#3388ff', label: 'Blue', translateKey: 'preferences.colors.blue' },
-  { value: '#ff0000', label: 'Red', translateKey: 'preferences.colors.red' },
-  { value: '#00cc00', label: 'Green', translateKey: 'preferences.colors.green' },
-  { value: '#ff9900', label: 'Orange', translateKey: 'preferences.colors.orange' },
-  { value: '#d53f94', label: 'Purple', translateKey: 'preferences.colors.purple' },
-  { value: '#000000', label: 'Black', translateKey: 'preferences.colors.black' }
+const presetColors = [
+  '#3388ff', // Blue
+  '#ff0000', // Red
+  '#00cc00', // Green
+  '#ff9900', // Orange
+  '#d53f94', // Purple
+  '#000000', // Black
 ];
 
 const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { theme, setLight, setDark } = useTheme();
   const { 
     map: mapPreferences, 
     units: unitPreferences,
@@ -75,7 +73,10 @@ const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
       selectedFlightPathWidth: 4,
       hideOtherFlightPaths: false,
       fadeOtherFlightPaths: true,
-      otherFlightPathsOpacity: 0.3
+      otherFlightPathsOpacity: 0.3,
+      showHeatmap: false,
+      heatmapIntensity: 0.4,
+      heatmapRadius: 5
     });
     setLocalUnitPreferences({
       distance: 'nm',
@@ -92,10 +93,7 @@ const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
     setOpen(isOpen);
   };
 
-  const getColorDisplay = (colorValue: string) => {
-    const color = colorOptions.find(c => c.value === colorValue);
-    return color ? t(color.translateKey) : colorValue;
-  };
+
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -107,12 +105,63 @@ const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[475px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('preferences.title')}</DialogTitle>
         </DialogHeader>
         
         <div className="grid gap-4 py-4">
+          {/* General Section */}
+          <div className="border-b pb-4">
+            <h4 className="text-sm font-medium mb-3">{t('preferences.general.title')}</h4>
+            
+            <div className="grid grid-cols-3 items-center gap-4 mb-3">
+              <Label htmlFor="language" className="text-right text-sm">
+                {t('settings.language')}
+              </Label>
+              <Select 
+                value={i18n.language} 
+                onValueChange={(value) => i18n.changeLanguage(value)}
+              >
+                <SelectTrigger className="col-span-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="en">{t('settings.en')}</SelectItem>
+                  <SelectItem value="fr">{t('settings.fr')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid grid-cols-3 items-center gap-4">
+              <Label htmlFor="theme" className="text-right text-sm">
+                {t('preferences.general.theme')}
+              </Label>
+              <div className="col-span-2">
+                <RadioGroup 
+                  value={theme} 
+                  onValueChange={(value) => value === 'dark' ? setDark() : setLight()}
+                  className="flex gap-4"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="light" id="light" />
+                    <Label htmlFor="light" className="flex items-center gap-1 cursor-pointer font-normal">
+                      <Sun className="h-4 w-4" />
+                      {t('preferences.general.light')}
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="dark" id="dark" />
+                    <Label htmlFor="dark" className="flex items-center gap-1 cursor-pointer font-normal">
+                      <Moon className="h-4 w-4" />
+                      {t('preferences.general.dark')}
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+          </div>
+          
           {/* Units Section */}
           <div className="border-b pb-4">
             <h4 className="text-sm font-medium mb-3">{t('preferences.units.title')}</h4>
@@ -159,40 +208,31 @@ const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
           {/* Map Section */}
           <div className="border-b pb-4">
             <h4 className="text-sm font-medium mb-3">{t('preferences.map.title')}</h4>
-            <div className="grid grid-cols-3 items-center gap-4">
+            <div className="grid grid-cols-3 items-center gap-4 mb-3">
               <Label htmlFor="flightPathColor" className="text-right">
-              {t('preferences.flightPathColor')}
-            </Label>
-            <Select 
-              value={localPreferences.flightPathColor} 
-              onValueChange={(value) => setLocalPreferences({...localPreferences, flightPathColor: value})}
-            >
-              <SelectTrigger className="col-span-2">
-                <SelectValue placeholder={getColorDisplay(localPreferences.flightPathColor)}>
-                  <div className="flex items-center">
-                    <div 
-                      className="w-4 h-4 rounded-full mr-2" 
-                      style={{backgroundColor: localPreferences.flightPathColor}} 
-                    />
-                    {getColorDisplay(localPreferences.flightPathColor)}
-                  </div>
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {colorOptions.map((color) => (
-                  <SelectItem key={color.value} value={color.value}>
-                    <div className="flex items-center">
-                      <div 
-                        className="w-4 h-4 rounded-full mr-2" 
-                        style={{backgroundColor: color.value}} 
-                      />
-                      {t(color.translateKey)}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+                {t('preferences.flightPathColor')}
+              </Label>
+              <div className="col-span-2">
+                <ColorPicker
+                  value={localPreferences.flightPathColor}
+                  onChange={(color) => setLocalPreferences({...localPreferences, flightPathColor: color})}
+                  presetColors={presetColors}
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-3 items-center gap-4">
+              <Label htmlFor="selectedFlightPathColor" className="text-right">
+                {t('preferences.selectedFlightPathColor')}
+              </Label>
+              <div className="col-span-2">
+                <ColorPicker
+                  value={localPreferences.selectedFlightPathColor}
+                  onChange={(color) => setLocalPreferences({...localPreferences, selectedFlightPathColor: color})}
+                  presetColors={presetColors}
+                />
+              </div>
+            </div>
           
             <div className="grid grid-cols-3 items-center gap-4">
               <Label htmlFor="flightPathWidth" className="text-right">
@@ -233,7 +273,67 @@ const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
             </div>
           </div>
           
-          <div className="border-t pt-4 mt-2">
+          {/* Heatmap Section */}
+          <div className="border-b pb-4">
+            <h4 className="text-sm font-medium mb-3">{t('preferences.heatmap.title')}</h4>
+            
+            <div className="grid grid-cols-3 items-center gap-4 mb-3">
+              <Label htmlFor="showHeatmap" className="text-right text-sm">
+                {t('preferences.heatmap.show')}
+              </Label>
+              <div className="col-span-2">
+                <Switch 
+                  id="showHeatmap"
+                  checked={localPreferences.showHeatmap}
+                  onCheckedChange={(checked) => setLocalPreferences({...localPreferences, showHeatmap: checked})}
+                />
+              </div>
+            </div>
+            
+            {localPreferences.showHeatmap && (
+              <>
+                <div className="grid grid-cols-3 items-center gap-4 mb-3">
+                  <Label htmlFor="heatmapIntensity" className="text-right text-sm">
+                    {t('preferences.heatmap.intensity')}
+                  </Label>
+                  <div className="col-span-2 flex items-center gap-4">
+                    <Slider 
+                      id="heatmapIntensity"
+                      defaultValue={[localPreferences.heatmapIntensity * 100]} 
+                      max={100} 
+                      min={5} 
+                      step={5}
+                      value={[localPreferences.heatmapIntensity * 100]}
+                      onValueChange={(values) => setLocalPreferences({...localPreferences, heatmapIntensity: values[0] / 100})}
+                      className="flex-1"
+                    />
+                    <span className="w-8 text-center">{Math.round(localPreferences.heatmapIntensity * 100)}%</span>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label htmlFor="heatmapRadius" className="text-right text-sm">
+                    {t('preferences.heatmap.radius')}
+                  </Label>
+                  <div className="col-span-2 flex items-center gap-4">
+                    <Slider 
+                      id="heatmapRadius"
+                      defaultValue={[localPreferences.heatmapRadius]} 
+                      max={20} 
+                      min={1} 
+                      step={1}
+                      value={[localPreferences.heatmapRadius]}
+                      onValueChange={(values) => setLocalPreferences({...localPreferences, heatmapRadius: values[0]})}
+                      className="flex-1"
+                    />
+                    <span className="w-8 text-center">{localPreferences.heatmapRadius}px</span>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+          
+          <div className="border-b pb-4">
             <h4 className="text-sm font-medium mb-3">{t('preferences.otherFlightPaths')}</h4>
             
             <div className="grid grid-cols-3 items-center gap-4 mb-3">

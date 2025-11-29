@@ -3,8 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Plane, Loader2, AlertCircle, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
-import LanguageSelector from '@/components/LanguageSelector';
+import PreferencesDialog from '@/components/preferences/PreferencesDialog';
 import MapView from '@/components/map/MapView';
 import AirfieldList from '@/components/airfield/AirfieldList';
 import AirfieldDetails from '@/components/airfield/AirfieldDetails';
@@ -124,8 +123,7 @@ const SharedViewPage = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <LanguageSelector />
-          <ThemeToggle />
+          <PreferencesDialog />
           <Button variant="outline" size="sm" onClick={() => navigate('/')}>
             {t('share.backToMyData')}
           </Button>

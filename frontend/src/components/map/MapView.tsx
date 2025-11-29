@@ -5,8 +5,9 @@ import { useAirfieldStore } from '@/store/airfield-store';
 import { usePreferencesStore } from '@/store/preferences-store';
 import { Airfield, FlightPath } from '@/types/airfield';
 import { Button } from '@/components/ui/button';
-import { Layers, Maximize2 } from 'lucide-react';
+import { Layers, Maximize2, Flame } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import HeatmapLayer from './HeatmapLayer';
 import 'leaflet/dist/leaflet.css';
 
 // Define available map styles
@@ -307,10 +308,28 @@ const MapView = ({
     return t('map.autoZoom.flightPaths');
   };
 
+  // Toggle heatmap
+  const toggleHeatmap = () => {
+    usePreferencesStore.getState().updateMapPreferences({
+      showHeatmap: !mapPreferences.showHeatmap
+    });
+  };
+
   return (
     <div className={`w-full h-full rounded-md overflow-hidden relative ${className}`}>
        {/* Map Controls - positioned absolutely over the map */}
         <div className="absolute top-2 right-2 z-[500] flex flex-col gap-2">
+          {/* Heatmap toggle button */}
+          <Button 
+            variant={mapPreferences.showHeatmap ? "default" : "secondary"}
+            size="sm" 
+            onClick={toggleHeatmap}
+            title={t('map.heatmap.tooltip')}
+          >
+            <Flame className="h-4 w-4 mr-1" />
+            {t('map.heatmap.label')}
+          </Button>
+          
           {/* Auto-zoom button */}
           <Button 
             variant={autoZoomMode !== null ? "default" : "secondary"}
@@ -374,8 +393,18 @@ const MapView = ({
         
         {homeAirfield && <MapRecenter airfield={homeAirfield} />}
         
+        {/* Heatmap layer */}
+        {mapPreferences.showHeatmap && (
+          <HeatmapLayer 
+            flightPaths={flightPaths}
+            intensity={mapPreferences.heatmapIntensity}
+            radius={mapPreferences.heatmapRadius}
+            maxIntensity={1}
+          />
+        )}
+        
         {/* Display flight paths */}
-        {flightPaths.map(flightPath => {
+        {!mapPreferences.showHeatmap && flightPaths.map(flightPath => {
           const isSelected = selectedFlightPath?.id === flightPath.id;
           const hasSelection = selectedFlightPath !== null;
           
