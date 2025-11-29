@@ -225,13 +225,9 @@ function HomePage() {
                   />
                 ) : (
                   <div className="h-full">
-                    <div className="flex mb-2 justify-between items-center">
-                      <h3 className="text-sm font-medium">Flight Logs</h3>
-                      <FlightUploadDialog onUploadComplete={handleFlightUploadComplete} />
-                    </div>
                     <FlightList
                       onSelectFlight={handleFlightSelect}
-                      className="h-[calc(100%-40px)]"
+                      className="h-[calc(100%)]"
                     />
                   </div>
                 )}

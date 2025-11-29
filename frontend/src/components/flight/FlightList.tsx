@@ -19,7 +19,8 @@ import {
   MapPin,
   TrashIcon,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Search
 } from 'lucide-react';
 import { calculateFlightStatistics } from '@/lib/flight-parser';
 import { usePreferencesStore } from '@/store/preferences-store';
@@ -69,32 +70,23 @@ const FlightList = ({
     }
   };
   
-  const handleDeleteFlight = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    deleteFlightPath(id);
-  };
-  
   return (
     <Card className={`flex flex-col h-full overflow-hidden ${className}`}>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-xl flex items-center gap-2">
-          <Plane className="h-5 w-5 text-primary" />
-          {t('flights.title')}
-        </CardTitle>
-        <CardDescription>
-          {flightPaths.length} flight{flightPaths.length !== 1 ? 's' : ''} recorded
-        </CardDescription>
-        <Input 
-          type="text"
-          placeholder={t('flights.search')}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="mt-2"
-        />
-      </CardHeader>
-      <CardContent className="flex-grow pb-0 overflow-hidden">
+      <div className="px-3 py-3">
+        <div className='relative flex-1'>
+          <Search className="w-4 h-4 absolute left-2.5 top-2.5 text-muted-foreground" />
+          <Input 
+            type="text"
+            placeholder={t('flights.search')}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8"
+            />
+          </div>
+      </div>
+      <CardContent className="p-3 flex-grow pb-0">
         {filteredFlights.length > 0 ? (
-          <ScrollArea className="max-h-[calc(100%-1rem)] overflow-hidden">
+          <ScrollArea className="overflow-hidden h-full max-h-[calc(100vh-280px)]">
             <div className="space-y-3">
               {filteredFlights.map(flight => {
                 const stats = calculateFlightStatistics(flight);
@@ -136,6 +128,7 @@ const FlightList = ({
               })}
             </div>
           </ScrollArea>
+          
         ) : (
           <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground p-4">
             <Plane className="h-16 w-16 mb-4 opacity-20" />
@@ -150,6 +143,11 @@ const FlightList = ({
           </div>
         )}
       </CardContent>
+      <div className="p-3 border-t flex items-center justify-between">
+        <div className="text-sm text-muted-foreground">
+            {filteredFlights.length} flights
+        </div>
+      </div>
     </Card>
   );
 };

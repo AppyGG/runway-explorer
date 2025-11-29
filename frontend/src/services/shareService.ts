@@ -20,7 +20,7 @@ export async function createShare(
   airfields: Airfield[],
   flightPaths: FlightPath[],
   title?: string
-): Promise<{ url: string; key: string; id: string }> {
+): Promise<{ url: string; key: string; reference: string }> {
   // Generate encryption key
   const encryptionKey = generateEncryptionKey();
   
@@ -60,12 +60,12 @@ export async function createShare(
   
   // Create share URL with encryption key in the anchor (fragment)
   const baseUrl = window.location.origin;
-  const shareUrl = `${baseUrl}/share/${result.id}#${encryptionKey}`;
+  const shareUrl = `${baseUrl}/share/${result.reference}#${encryptionKey}`;
   
   return {
     url: shareUrl,
     key: encryptionKey,
-    id: result.id
+    reference: result.reference
   };
 }
 

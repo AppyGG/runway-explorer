@@ -19,7 +19,7 @@ export interface ShareableData {
  * Response from the share API
  */
 export interface ShareResponse {
-  id: string; // Unique ID for the share
+  reference: string; // Unique ID for the share
   expiresAt?: string; // Optional expiration date
 }
 

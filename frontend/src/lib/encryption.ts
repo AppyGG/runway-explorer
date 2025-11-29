@@ -54,8 +54,14 @@ export async function encryptData(data: any, key: string): Promise<string> {
   combined.set(iv, 0);
   combined.set(new Uint8Array(encryptedBuffer), iv.length);
   
-  // Convert to base64
-  return btoa(String.fromCharCode(...combined));
+  // Convert to base64 in chunks to avoid call stack size exceeded error
+  const chunkSize = 8192; // Process 8KB at a time
+  let binaryString = '';
+  for (let i = 0; i < combined.length; i += chunkSize) {
+    const chunk = combined.subarray(i, Math.min(i + chunkSize, combined.length));
+    binaryString += String.fromCharCode(...chunk);
+  }
+  return btoa(binaryString);
 }
 
 /**
@@ -67,8 +73,12 @@ export async function encryptData(data: any, key: string): Promise<string> {
 export async function decryptData(encryptedData: string, key: string): Promise<any> {
   const cryptoKey = await hexToKey(key);
   
-  // Decode base64
-  const combined = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
+  // Decode base64 - handle large data by processing in chunks
+  const binaryString = atob(encryptedData);
+  const combined = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    combined[i] = binaryString.charCodeAt(i);
+  }
   
   // Extract IV and encrypted data
   const iv = combined.slice(0, 12);

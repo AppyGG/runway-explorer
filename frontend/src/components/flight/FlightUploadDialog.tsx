@@ -67,7 +67,7 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
   const [open, setOpen] = useState(false);
   const [flightPreview, setFlightPreview] = useState<FlightPath | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { airfields, addFlightPath } = useAirfieldStore();
+  const { airfields, addFlightPath, updateAirfield } = useAirfieldStore();
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -150,6 +150,14 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
       };
       
       addFlightPath(newFlight);
+      
+      // Automatically mark arrival airfield as visited if it's not already
+      if (values.arrival && values.arrival !== 'null') {
+        const arrivalAirfield = airfields.find(a => a.id === values.arrival);
+        if (arrivalAirfield && !arrivalAirfield.visited) {
+          updateAirfield(values.arrival, { visited: true });
+        }
+      }
       
       toast({
         title: "Success",

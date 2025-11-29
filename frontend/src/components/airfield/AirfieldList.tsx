@@ -425,7 +425,7 @@ const AirfieldList = ({
         )}
       </div>
 
-      <ScrollArea className="flex-1 overflow-hidden h-full max-h-[calc(100vh-320px)]">
+      <ScrollArea className="flex-1 overflow-hidden h-full max-h-[calc(100vh-310px)]">
         {sortedAirfields.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
             <MapPin className="h-8 w-8 mb-2 opacity-50" />
