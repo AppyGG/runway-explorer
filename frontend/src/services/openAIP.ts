@@ -7,7 +7,7 @@ import { Airfield } from '@/types/airfield';
 import { v4 as uuidv4 } from 'uuid';
 
 // Backend API endpoint
-const BACKEND_API_URL = import.meta.env.BACKEND_URL || 'http://localhost:3008';
+const BACKEND_API_URL = import.meta.env.VITE_BACKEND_URL;
 
 // OpenAIP response types
 interface OpenAIPAirport {

@@ -7,7 +7,7 @@ import { encryptData, generateEncryptionKey } from '@/lib/encryption';
 import { Airfield, FlightPath } from '@/types/airfield';
 
 // Backend API endpoint - replace with your actual backend URL
-const SHARE_API_URL = import.meta.env.VITE_SHARE_API_URL || 'http://localhost:3008/api/shares';
+const SHARE_API_URL = import.meta.env.VITE_SHARE_API_URL;
 
 /**
  * Create a shareable link for flights and airfields
