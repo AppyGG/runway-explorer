@@ -179,8 +179,15 @@ const MapView = ({
     
     useEffect(() => {
       if (flightPath && flightPath.coordinates.length > 0) {
-        const bounds = latLngBounds(flightPath.coordinates.map(coord => [coord[0], coord[1]]));
-        map.fitBounds(bounds, { padding: [50, 50] });
+        // Use double requestAnimationFrame to ensure the Polyline is fully rendered
+        // First RAF: ensures React has committed the changes to the DOM
+        // Second RAF: ensures the browser has painted the changes
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            const bounds = latLngBounds(flightPath.coordinates.map(coord => [coord[0], coord[1]]));
+            map.fitBounds(bounds, { padding: [50, 50] });
+          });
+        });
       }
     }, [map, flightPath]);
     

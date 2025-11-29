@@ -157,9 +157,13 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
       });
       
       if (onUploadComplete) {
-        // Need to add the id that was generated in the store
-        const addedFlight = { ...newFlight, id: crypto.randomUUID() };
-        onUploadComplete(addedFlight as FlightPath);
+        // Use a small delay to ensure the store has been updated and the component will re-render
+        setTimeout(() => {
+          // Get the most recently added flight from the store (it will have the correct ID)
+          const flightPaths = useAirfieldStore.getState().flightPaths;
+          const addedFlight = flightPaths[flightPaths.length - 1];
+          onUploadComplete(addedFlight);
+        }, 0);
       }
       
       setOpen(false);
