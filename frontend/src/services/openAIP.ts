@@ -112,3 +112,46 @@ export const searchAirfields = async (
     return [];
   }
 };
+
+/**
+ * Search airports by position (nearest airfields)
+ * Uses OpenAIP's pos and dist parameters
+ * @param lat Latitude of the search center
+ * @param lng Longitude of the search center
+ * @param distanceNm Maximum distance in nautical miles (default: 5)
+ * @param limit Maximum number of results to return (default: 5)
+ * @returns Promise with array of Airfield objects
+ */
+export const searchAirfieldsByPosition = async (
+  lat: number,
+  lng: number,
+  distanceNm: number = 5,
+  limit: number = 5
+): Promise<Airfield[]> => {
+  try {
+    // Convert nautical miles to meters (1 NM = 1852 meters)
+    const distanceMeters = Math.round(distanceNm * 1852);
+    
+    // Call our backend with position parameters
+    const response = await fetch(
+      `${BACKEND_API_URL}/api/airports/search?lat=${lat}&lng=${lng}&dist=${distanceMeters}&limit=${limit}`,
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Backend API returned status ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Convert the OpenAIP format to our Airfield format
+    return data.items.map(convertToAirfield);
+  } catch (error) {
+    console.error('Error searching airfields by position:', error);
+    return [];
+  }
+};

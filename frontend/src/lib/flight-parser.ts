@@ -354,7 +354,9 @@ export const matchAirfields = (flightPath: FlightPath, airfields: Array<{ id: st
   
   return {
     departure: departureAirfield?.id,
-    arrival: arrivalAirfield?.id
+    arrival: arrivalAirfield?.id,
+    departureCoordinates: startCoord,
+    arrivalCoordinates: endCoord
   };
 };
 

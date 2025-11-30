@@ -186,8 +186,8 @@ const FlightDetails = ({
     URL.revokeObjectURL(url);
     
     toast({
-      title: 'Flight Exported',
-      description: 'Flight data exported as GPX file.'
+      title: t('flights.exported.title'),
+      description: t('flights.exported.description')
     });
   };
   
@@ -202,7 +202,7 @@ const FlightDetails = ({
           
           <div className="flex items-center gap-2">
             <FileType2 className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground">{flight.fileType} file: {flight.fileName}</span>
+            <span className="text-muted-foreground">{flight.fileType} {t('flights.file')}: {flight.fileName}</span>
           </div>
         </div>
         
@@ -214,8 +214,8 @@ const FlightDetails = ({
                 {t('flights.distance')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="py-0">
-              <div className="text-2xl font-bold">{formatDistance(stats.totalDistance, units.distance)}</div>
+            <CardContent className="py-1">
+              <div className="text-base">{formatDistance(stats.totalDistance, units.distance)}</div>
             </CardContent>
           </Card>
           
@@ -223,17 +223,17 @@ const FlightDetails = ({
             <CardHeader className="py-3">
               <CardTitle className="text-sm font-medium flex items-center gap-1.5">
                 <ArrowUpRight className="h-4 w-4 text-primary" />
-                Departure
+                {t('flights.departure')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="py-0">
+            <CardContent className="py-1">
               {departureAirfield ? (
                 <div className="text-base font-semibold truncate">
                   {departureAirfield.name}
                   {departureAirfield.icao && ` (${departureAirfield.icao})`}
                 </div>
               ) : (
-                <div className="text-muted-foreground text-base">Not specified</div>
+                <div className="text-muted-foreground text-base">{t('flights.notSpecified')}</div>
               )}
             </CardContent>
           </Card>
@@ -242,17 +242,17 @@ const FlightDetails = ({
             <CardHeader className="py-3">
               <CardTitle className="text-sm font-medium flex items-center gap-1.5">
                 <ArrowDownRight className="h-4 w-4 text-primary" />
-                Arrival
+                {t('flights.arrival')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="py-0">
+            <CardContent className="py-1">
               {arrivalAirfield ? (
                 <div className="text-base font-semibold truncate">
                   {arrivalAirfield.name}
                   {arrivalAirfield.icao && ` (${arrivalAirfield.icao})`}
                 </div>
               ) : (
-                <div className="text-muted-foreground text-base">Not specified</div>
+                <div className="text-muted-foreground text-base">{t('flights.notSpecified')}</div>
               )}
             </CardContent>
           </Card>
@@ -260,14 +260,14 @@ const FlightDetails = ({
         
         {/* Enhanced flight statistics */}
         <div>
-          <h3 className="text-lg font-semibold mb-2">Flight Statistics</h3>
+          <h3 className="text-lg font-semibold mb-2">{t('flights.statistics')}</h3>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             <Card>
               <CardContent className="p-3">
                 <div className="flex flex-col">
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
                     <Clock className="h-4 w-4" />
-                    Duration
+                    {t('flights.duration')}
                   </div>
                   <div className="text-lg font-semibold">
                     {stats?.durationFormatted}
@@ -282,7 +282,7 @@ const FlightDetails = ({
                   <div className="flex flex-col">
                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
                       <Mountain className="h-4 w-4" />
-                      Max Altitude
+                      {t('flights.maxAltitude')}
                     </div>
                     <div className="text-lg font-semibold">
                       {stats.maxAltitude} {t('units.ft')}
@@ -298,7 +298,7 @@ const FlightDetails = ({
                   <div className="flex flex-col">
                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
                       <Plane className="h-4 w-4" />
-                      Avg Altitude
+                      {t('flights.avgAltitude')}
                     </div>
                     <div className="text-lg font-semibold">
                       {stats.avgAltitude} {t('units.ft')}
@@ -314,7 +314,7 @@ const FlightDetails = ({
                   <div className="flex flex-col">
                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
                       <Gauge className="h-4 w-4" />
-                      Max Speed
+                      {t('flights.maxSpeed')}
                     </div>
                     <div className="text-lg font-semibold">
                       {formatSpeed(stats.maxSpeed, units.speed)}
@@ -332,21 +332,21 @@ const FlightDetails = ({
         )}
         
         <div>
-          <h3 className="text-lg font-semibold mb-2">Route Details</h3>
+          <h3 className="text-lg font-semibold mb-2">{t('flights.routeDetails')}</h3>
           <Card>
             <CardContent className="p-3">
               <div className="text-sm">
-                {flight.coordinates.length} waypoints recorded
+                {t('flights.waypointsRecorded', { count: flight.coordinates.length })}
                 {flight.coordinates.length > 0 && (
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <div>
-                      <div className="text-xs text-muted-foreground mb-1">Start coordinates</div>
+                      <div className="text-xs text-muted-foreground mb-1">{t('flights.startCoordinates')}</div>
                       <div>
                         {flight.coordinates[0][0].toFixed(4)}, {flight.coordinates[0][1].toFixed(4)}
                       </div>
                     </div>
                     <div>
-                      <div className="text-xs text-muted-foreground mb-1">End coordinates</div>
+                      <div className="text-xs text-muted-foreground mb-1">{t('flights.endCoordinates')}</div>
                       <div>
                         {flight.coordinates[flight.coordinates.length-1][0].toFixed(4)}, 
                         {flight.coordinates[flight.coordinates.length-1][1].toFixed(4)}
@@ -362,17 +362,17 @@ const FlightDetails = ({
         <div className="flex justify-between">
           <Button variant="outline" onClick={onClose}>
             <ChevronLeft className="h-4 w-4 mr-1" />
-            Back
+            {t('actions.back')}
           </Button>
           <div className="space-x-2">
             <Button variant="outline" onClick={exportFlightGPX}>
               <Download className="h-4 w-4 mr-1" />
-              Export GPX
+              {t('flights.export')}
             </Button>
           {!readOnly && (
             <Button variant="destructive" onClick={handleDeleteFlight}>
                 <TrashIcon className="h-4 w-4 mr-1" />
-                Delete Flight
+                {t('flights.delete')}
               </Button>
           )}
           </div>
@@ -382,7 +382,7 @@ const FlightDetails = ({
   ) : (
     <div className="flex flex-col items-center justify-center text-center h-full p-4">
       <Plane className="h-16 w-16 mb-4 opacity-20" />
-      <p className="text-muted-foreground">Select a flight to view details</p>
+      <p className="text-muted-foreground">{t('flights.selectFlight')}</p>
     </div>
   );
   

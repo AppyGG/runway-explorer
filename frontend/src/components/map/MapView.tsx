@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Layers, Maximize2, Flame } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import HeatmapLayer from './HeatmapLayer';
+import '@/lib/smoothWheelZoom'
 import 'leaflet/dist/leaflet.css';
 
 // Define available map styles
@@ -385,6 +386,9 @@ const MapView = ({
         zoom={9} 
         style={{ height: '100%', width: '100%' }}
         className='z-5'
+        scrollWheelZoom={false}
+        smoothWheelZoom={true} // Smooth scroll plugin
+        smoothSensitivity={1}
       >
         <TileLayer
             attribution={currentMapStyle.attribution}

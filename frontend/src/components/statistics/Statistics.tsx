@@ -10,14 +10,10 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { 
-  Plane, 
-  MapPin, 
-  Calendar, 
+  Plane,
   Ruler, 
   Clock, 
   TrendingUp,
-  Home,
-  Target,
   Route,
   TowerControl,
   Map as MapIcon,
@@ -185,11 +181,11 @@ const Statistics = ({ className = '' }: StatisticsProps) => {
               <CardHeader className="py-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-1.5">
                   <TowerControl className="h-4 w-4 text-primary" />
-                  {t('statistics.totalAirfields')}
+                  {t('statistics.visitedAirfields')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="py-0 pb-3">
-                <div className="text-3xl font-bold">{stats.totalAirfields}</div>
+                <div className="text-3xl font-bold">{stats.visitedAirfields}</div>
               </CardContent>
             </Card>
 
@@ -232,9 +228,9 @@ const Statistics = ({ className = '' }: StatisticsProps) => {
             <CardContent className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">
-                  {t('statistics.visitedAirfields')}
+                  {t('statistics.airfields')}
                 </span>
-                <span className="font-semibold">{stats.visitedAirfields}</span>
+                <span className="font-semibold">{stats.totalAirfields}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">

@@ -99,7 +99,7 @@ const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button variant="ghost" size="icon">
+          <Button variant="outline" size="sm">
             <Settings className="h-4 w-4" />
             <span className="sr-only">{t('preferences.title')}</span>
           </Button>

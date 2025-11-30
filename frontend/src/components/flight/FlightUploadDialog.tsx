@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useAirfieldStore } from '@/store/airfield-store';
 import { parseFlightFile, matchAirfields } from '@/lib/flight-parser';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
+import { Airfield } from '@/types/airfield';
+import AirfieldDiscoveryDialog from './AirfieldDiscoveryDialog';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -67,8 +70,16 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
   const [open, setOpen] = useState(false);
   const [flightPreview, setFlightPreview] = useState<FlightPath | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { airfields, addFlightPath, updateAirfield } = useAirfieldStore();
+  const { airfields, addFlightPath, updateAirfield, addAirfield } = useAirfieldStore();
   const { toast } = useToast();
+  const { t } = useTranslation();
+  
+  // Airfield discovery state
+  const [discoveryStep, setDiscoveryStep] = useState<'none' | 'departure' | 'arrival'>('none');
+  const [discoveredDepartureAirfield, setDiscoveredDepartureAirfield] = useState<Airfield | null>(null);
+  const [discoveredArrivalAirfield, setDiscoveredArrivalAirfield] = useState<Airfield | null>(null);
+  const [departureCoordinates, setDepartureCoordinates] = useState<[number, number] | null>(null);
+  const [arrivalCoordinates, setArrivalCoordinates] = useState<[number, number] | null>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -85,8 +96,8 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
       
       if (!flightData) {
         toast({
-          title: "Error",
-          description: "Could not parse flight data from file. Please ensure it's a valid KML or GPX file.",
+          title: t('upload.error'),
+          description: t('upload.invalidFile'),
           variant: "destructive"
         });
         form.reset();
@@ -96,8 +107,8 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
       // Verify coordinates exist and are valid
       if (!flightData.coordinates || flightData.coordinates.length < 2) {
         toast({
-          title: "Error",
-          description: "The uploaded file doesn't contain enough valid GPS coordinates.",
+          title: t('upload.error'),
+          description: t('upload.invalidCoordinates'),
           variant: "destructive"
         });
         form.reset();
@@ -105,7 +116,8 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
       }
 
       // Try to match departure/arrival airfields
-      const { departure, arrival } = matchAirfields(flightData, airfields);
+      const matchResult = matchAirfields(flightData, airfields);
+      const { departure, arrival, departureCoordinates, arrivalCoordinates } = matchResult;
       
       setFlightPreview({
         ...flightData,
@@ -119,10 +131,21 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
       if (departure) form.setValue('departure', departure);
       if (arrival) form.setValue('arrival', arrival);
       
+      // Store coordinates for potential discovery
+      setDepartureCoordinates(departureCoordinates);
+      setArrivalCoordinates(arrivalCoordinates);
+      
+      // Trigger airfield discovery if no matches found
+      if (!departure && departureCoordinates) {
+        setDiscoveryStep('departure');
+      } else if (!arrival && arrivalCoordinates) {
+        setDiscoveryStep('arrival');
+      }
+      
     } catch (error) {
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to process file",
+        title: t('upload.error'),
+        description: error instanceof Error ? error.message : t('upload.processingError'),
         variant: "destructive"
       });
     } finally {
@@ -130,38 +153,95 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
     }
   };
 
+  const handleDepartureAirfieldDiscovered = (airfield: Airfield) => {
+    setDiscoveredDepartureAirfield(airfield);
+    setDiscoveryStep('none');
+    
+    // Check if we need to discover arrival airfield
+    if (!form.getValues('arrival') && arrivalCoordinates) {
+      setDiscoveryStep('arrival');
+    }
+  };
+
+  const handleArrivalAirfieldDiscovered = (airfield: Airfield) => {
+    setDiscoveredArrivalAirfield(airfield);
+    setDiscoveryStep('none');
+  };
+
+  const handleSkipDiscovery = () => {
+    if (discoveryStep === 'departure') {
+      setDiscoveryStep('none');
+      // Check if we need to discover arrival airfield
+      if (!form.getValues('arrival') && arrivalCoordinates) {
+        setDiscoveryStep('arrival');
+      }
+    } else if (discoveryStep === 'arrival') {
+      setDiscoveryStep('none');
+    }
+  };
+
   const onSubmit = (values: FormValues) => {
     if (!flightPreview) {
       toast({
-        title: "Error",
-        description: "No flight data available to upload.",
+        title: t('upload.error'),
+        description: t('upload.noData'),
         variant: "destructive"
       });
       return;
     }
     
     try {
+      // Add discovered airfields to the store first
+      let departureId = values.departure;
+      let arrivalId = values.arrival;
+      
+      if (discoveredDepartureAirfield) {
+        addAirfield(discoveredDepartureAirfield);
+        // Get the ID from the store (it will be assigned during addAirfield)
+        const addedDeparture = useAirfieldStore.getState().airfields.find(
+          a => a.name === discoveredDepartureAirfield.name && 
+               a.coordinates.lat === discoveredDepartureAirfield.coordinates.lat
+        );
+        if (addedDeparture) {
+          departureId = addedDeparture.id;
+        }
+      }
+      
+      if (discoveredArrivalAirfield) {
+        addAirfield(discoveredArrivalAirfield);
+        // Get the ID from the store
+        const addedArrival = useAirfieldStore.getState().airfields.find(
+          a => a.name === discoveredArrivalAirfield.name && 
+               a.coordinates.lat === discoveredArrivalAirfield.coordinates.lat
+        );
+        if (addedArrival) {
+          arrivalId = addedArrival.id;
+          // Mark as visited
+          updateAirfield(addedArrival.id, { visited: true });
+        }
+      }
+      
       const newFlight: Omit<FlightPath, 'id'> = {
         ...flightPreview,
         name: values.name,
         date: format(values.date, 'yyyy-MM-dd'),
-        departure: values.departure,
-        arrival: values.arrival
+        departure: departureId,
+        arrival: arrivalId
       };
       
       addFlightPath(newFlight);
       
       // Automatically mark arrival airfield as visited if it's not already
-      if (values.arrival && values.arrival !== 'null') {
-        const arrivalAirfield = airfields.find(a => a.id === values.arrival);
+      if (arrivalId && arrivalId !== 'null' && !discoveredArrivalAirfield) {
+        const arrivalAirfield = airfields.find(a => a.id === arrivalId);
         if (arrivalAirfield && !arrivalAirfield.visited) {
-          updateAirfield(values.arrival, { visited: true });
+          updateAirfield(arrivalId, { visited: true });
         }
       }
       
       toast({
-        title: "Success",
-        description: "Flight uploaded successfully!",
+        title: t('upload.success'),
+        description: t('upload.successDescription'),
       });
       
       if (onUploadComplete) {
@@ -174,13 +254,19 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
         }, 0);
       }
       
+      // Reset state
       setOpen(false);
       form.reset();
       setFlightPreview(null);
+      setDiscoveredDepartureAirfield(null);
+      setDiscoveredArrivalAirfield(null);
+      setDepartureCoordinates(null);
+      setArrivalCoordinates(null);
+      setDiscoveryStep('none');
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to add flight to your collection. Please try again.",
+        title: t('upload.error'),
+        description: t('upload.addError'),
         variant: "destructive"
       });
       console.error("Error adding flight:", error);
@@ -188,20 +274,39 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
   };
 
   return (
+    <>
+      <AirfieldDiscoveryDialog
+        open={discoveryStep === 'departure'}
+        onOpenChange={(isOpen) => !isOpen && setDiscoveryStep('none')}
+        coordinates={departureCoordinates || [0, 0]}
+        type="departure"
+        onAirfieldSelected={handleDepartureAirfieldDiscovered}
+        onSkip={handleSkipDiscovery}
+      />
+      
+      <AirfieldDiscoveryDialog
+        open={discoveryStep === 'arrival'}
+        onOpenChange={(isOpen) => !isOpen && setDiscoveryStep('none')}
+        coordinates={arrivalCoordinates || [0, 0]}
+        type="arrival"
+        onAirfieldSelected={handleArrivalAirfieldDiscovered}
+        onSkip={handleSkipDiscovery}
+      />
+      
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
           <Button size="sm" className="gap-1">
             <Upload className="h-4 w-4" />
-            <span>Upload Flight</span>
+            <span>{t('flights.upload')}</span>
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="max-w-lg z-[1000]">
         <DialogHeader>
-          <DialogTitle>Upload Flight Data</DialogTitle>
+          <DialogTitle>{t('upload.title')}</DialogTitle>
           <DialogDescription>
-            Upload KML or GPX files to add flight traces to your logbook.
+            {t('flights.uploadInfo')}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -211,7 +316,7 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
               name="flightFile"
               render={({ field: { onChange, value, ...field } }) => (
                 <FormItem>
-                  <FormLabel>Flight File (KML/GPX)</FormLabel>
+                  <FormLabel>{t('upload.selectFile')}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -227,7 +332,7 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
                     />
                   </FormControl>
                   <FormDescription>
-                    Upload a KML or GPX file containing your flight path.
+                    {t('upload.formats')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -245,7 +350,7 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Flight Name</FormLabel>
+                      <FormLabel>{t('upload.name')}</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -259,7 +364,7 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
                   name="date"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Flight Date</FormLabel>
+                      <FormLabel>{t('upload.date')}</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -270,7 +375,7 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
                               {field.value ? (
                                 format(field.value, "PPP")
                               ) : (
-                                <span>Pick a date</span>
+                                <span>{t('upload.selectDate')}</span>
                               )}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
@@ -297,7 +402,7 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
                     name="departure"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Departure Airfield</FormLabel>
+                        <FormLabel>{t('flights.departure')}</FormLabel>
                         <Select 
                           onValueChange={field.onChange} 
                           defaultValue={field.value}
@@ -305,11 +410,11 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select departure" />
+                              <SelectValue placeholder={t('flights.selectDeparture')} />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="null">None</SelectItem>
+                          <SelectContent className="z-[1002]">
+                            <SelectItem value="null">{t('flights.none')}</SelectItem>
                             {airfields.map(airfield => (
                               <SelectItem key={airfield.id} value={airfield.id}>
                                 {airfield.name} {airfield.icao ? `(${airfield.icao})` : ''}
@@ -317,6 +422,11 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
                             ))}
                           </SelectContent>
                         </Select>
+                        {discoveredDepartureAirfield && (
+                          <FormDescription className="text-xs text-green-600">
+                            ✓ {t('flights.willBeAdded', { name: discoveredDepartureAirfield.name })}
+                          </FormDescription>
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}
@@ -327,7 +437,7 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
                     name="arrival"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Arrival Airfield</FormLabel>
+                        <FormLabel>{t('flights.arrival')}</FormLabel>
                         <Select 
                           onValueChange={field.onChange} 
                           defaultValue={field.value}
@@ -335,11 +445,11 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select arrival" />
+                              <SelectValue placeholder={t('flights.selectArrival')} />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="null">None</SelectItem>
+                          <SelectContent className="z-[1002]">
+                            <SelectItem value="null">{t('flights.none')}</SelectItem>
                             {airfields.map(airfield => (
                               <SelectItem key={airfield.id} value={airfield.id}>
                                 {airfield.name} {airfield.icao ? `(${airfield.icao})` : ''}
@@ -347,6 +457,11 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
                             ))}
                           </SelectContent>
                         </Select>
+                        {discoveredArrivalAirfield && (
+                          <FormDescription className="text-xs text-green-600">
+                            ✓ {t('flights.willBeAdded', { name: discoveredArrivalAirfield.name })}
+                          </FormDescription>
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}
@@ -361,19 +476,20 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
                 variant="outline" 
                 onClick={() => setOpen(false)}
               >
-                Cancel
+                {t('upload.cancel')}
               </Button>
               <Button 
                 type="submit" 
                 disabled={isLoading || !flightPreview}
               >
-                Upload Flight
+                {t('upload.submit')}
               </Button>
             </DialogFooter>
           </form>
         </Form>
       </DialogContent>
     </Dialog>
+    </>
   );
 };
 
