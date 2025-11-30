@@ -9,7 +9,7 @@ interface AirfieldState {
   homeAirfieldId: string | null;
   
   // Actions
-  addAirfield: (airfield: Omit<Airfield, 'id'>) => void;
+  addAirfield: (airfield: Omit<Airfield, 'id'>) => string;
   updateAirfield: (id: string, updates: Partial<Airfield>) => void;
   deleteAirfield: (id: string) => void;
   toggleVisited: (id: string) => void;
@@ -29,9 +29,13 @@ export const useAirfieldStore = create<AirfieldState>()(
       flightPaths: [],
       homeAirfieldId: '1',
       
-      addAirfield: (airfield) => set((state) => ({
-        airfields: [...state.airfields, { ...airfield, id: uuidv4() }]
-      })),
+      addAirfield: (airfield) => {
+        const id = uuidv4();
+        set((state) => ({
+          airfields: [...state.airfields, { ...airfield, id }]
+        }));
+        return id;
+      },
       
       updateAirfield: (id, updates) => set((state) => ({
         airfields: state.airfields.map(airfield => 

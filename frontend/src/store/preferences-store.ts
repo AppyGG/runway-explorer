@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export type DistanceUnit = 'nm' | 'km' | 'mi';
 export type SpeedUnit = 'kt' | 'kmh' | 'mph';
+export type AircraftType = 'airplane' | 'ultralight' | 'glider' | null;
 
 export interface MapPreferences {
   flightPathColor: string;
@@ -22,19 +23,27 @@ export interface UnitPreferences {
   speed: SpeedUnit;
 }
 
+export interface UserPreferences {
+  aircraftType: AircraftType;
+  hasCompletedOnboarding: boolean;
+}
+
 export interface PreferencesState {
   map: MapPreferences;
   units: UnitPreferences;
+  user: UserPreferences;
 
   // Actions
   updateMapPreferences: (preferences: Partial<MapPreferences>) => void;
   resetMapPreferences: () => void;
   updateUnitPreferences: (preferences: Partial<UnitPreferences>) => void;
   resetUnitPreferences: () => void;
+  updateUserPreferences: (preferences: Partial<UserPreferences>) => void;
+  setOnboardingComplete: (complete: boolean) => void;
 }
 
 const DEFAULT_MAP_PREFERENCES: MapPreferences = {
-  flightPathColor: '#d53f94ff', // Default blue color
+  flightPathColor: '#3f80d5ff', // Default blue color
   selectedFlightPathColor: '#ff0000', // Default red color
   flightPathWidth: 4,
   selectedFlightPathWidth: 4,
@@ -51,11 +60,17 @@ const DEFAULT_UNIT_PREFERENCES: UnitPreferences = {
   speed: 'kt' // Knots (default for aviation)
 };
 
+const DEFAULT_USER_PREFERENCES: UserPreferences = {
+  aircraftType: null,
+  hasCompletedOnboarding: false
+};
+
 export const usePreferencesStore = create<PreferencesState>()(
   persist(
     (set) => ({
       map: { ...DEFAULT_MAP_PREFERENCES },
       units: { ...DEFAULT_UNIT_PREFERENCES },
+      user: { ...DEFAULT_USER_PREFERENCES },
       
       updateMapPreferences: (preferences) => set((state) => ({
         map: { ...state.map, ...preferences }
@@ -71,6 +86,14 @@ export const usePreferencesStore = create<PreferencesState>()(
       
       resetUnitPreferences: () => set(() => ({
         units: { ...DEFAULT_UNIT_PREFERENCES }
+      })),
+      
+      updateUserPreferences: (preferences) => set((state) => ({
+        user: { ...state.user, ...preferences }
+      })),
+      
+      setOnboardingComplete: (complete) => set((state) => ({
+        user: { ...state.user, hasCompletedOnboarding: complete }
       }))
     }),
     {

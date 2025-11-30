@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Plane, 
@@ -24,15 +24,27 @@ import ShareDialog from '@/components/share/ShareDialog';
 import Statistics from '@/components/statistics/Statistics';
 import { Airfield, FlightPath } from '@/types/airfield';
 import { useAirfieldStore } from '@/store/airfield-store';
+import { usePreferencesStore } from '@/store/preferences-store';
 import { useIsMobile } from '@/hooks/use-mobile';
+import OnboardingGuide from '@/components/onboarding/OnboardingGuide';
 
 function HomePage() {
   const isMobile = useIsMobile();
-  const { homeAirfieldId, airfields } = useAirfieldStore();
+  const { homeAirfieldId, airfields, flightPaths } = useAirfieldStore();
+  const { user } = usePreferencesStore();
   const [selectedAirfield, setSelectedAirfield] = useState<Airfield | null>(null);
   const [selectedFlightPath, setSelectedFlightPath] = useState<FlightPath | null>(null);
   const [activeTab, setActiveTab] = useState<string>("map");
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const { t } = useTranslation();
+  
+  // Show onboarding on mount if needed
+  useEffect(() => {
+    const shouldShowOnboarding = !user.hasCompletedOnboarding && airfields.length === 0 && flightPaths.length === 0;
+    if (shouldShowOnboarding) {
+      setShowOnboarding(true);
+    }
+  }, [user.hasCompletedOnboarding, airfields.length, flightPaths.length]);
   
   // Find home airfield
   const homeAirfield = airfields.find(a => a.id === homeAirfieldId) || null;
@@ -57,6 +69,12 @@ function HomePage() {
   };
 
   return (
+    <>
+      <OnboardingGuide 
+        open={showOnboarding} 
+        onClose={() => setShowOnboarding(false)} 
+      />
+      
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="bg-card border-b p-3 md:p-4 flex items-center justify-between">
@@ -78,6 +96,18 @@ function HomePage() {
           <PreferencesDialog />
         </div>
       </header>
+
+      {showOnboarding && 
+        <OnboardingGuide
+          open
+          onClose={
+            () => {
+              console.log('toto')
+            }
+          }
+        >
+        </OnboardingGuide>
+      }
 
       {/* Main content - responsive layout */}
       {isMobile ? (
@@ -234,6 +264,7 @@ function HomePage() {
         </div>
       )}
     </div>
+    </>
   );
 }
 

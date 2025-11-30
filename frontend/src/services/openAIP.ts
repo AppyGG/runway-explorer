@@ -120,13 +120,15 @@ export const searchAirfields = async (
  * @param lng Longitude of the search center
  * @param distanceNm Maximum distance in nautical miles (default: 5)
  * @param limit Maximum number of results to return (default: 5)
+ * @param type Show only airports of the provided types
  * @returns Promise with array of Airfield objects
  */
 export const searchAirfieldsByPosition = async (
   lat: number,
   lng: number,
   distanceNm: number = 5,
-  limit: number = 5
+  limit: number = 5,
+  type: number[],
 ): Promise<Airfield[]> => {
   try {
     // Convert nautical miles to meters (1 NM = 1852 meters)
@@ -134,7 +136,7 @@ export const searchAirfieldsByPosition = async (
     
     // Call our backend with position parameters
     const response = await fetch(
-      `${BACKEND_API_URL}/api/airports/search?lat=${lat}&lng=${lng}&dist=${distanceMeters}&limit=${limit}`,
+      `${BACKEND_API_URL}/api/airports/search?lat=${lat}&lng=${lng}&dist=${distanceMeters}&limit=${limit}&type=${type}`,
       {
         headers: {
           'Content-Type': 'application/json'

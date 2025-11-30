@@ -18,6 +18,7 @@
       "map.heatmap.tooltip": "Activer/désactiver la carte de chaleur des vols",
       
       "airfields.title": "Aérodromes",
+      "airfields.mine": "Mes Aérodromes",
       "airfields.filter.all": "Tous les aérodromes",
       "airfields.filter.visited": "Visités",
       "airfields.filter.planned": "Planifiés",
@@ -41,10 +42,11 @@
       "airfields.notes.placeholder": "Ajoutez vos notes sur cet aérodrome...",
       "airfields.flights": "Vols associés",
       "airfields.noFlights": "Aucun vol vers/depuis cet aérodrome",
+      "airfields.noResults": "Aucun aérodrome trouvé",
       
       "flights.title": "Journaux de vol",
-      "flights.upload": "Charger un vol",
       "flights.search": "Rechercher un vol...",
+      "flights.upload": "Charger un vol",
       "flights.date": "Date",
       "flights.departure": "Départ",
       "flights.arrival": "Arrivée",
@@ -72,6 +74,20 @@
       "flights.nameUpdated.description": "Le nom du vol a été mis à jour avec succès.",
       "flights.deleted.title": "Vol supprimé",
       "flights.deleted.description": "{{name}} a été supprimé.",
+      "flights.delete": "Supprimer le vol",
+      "flights.file": "fichier",
+      "flights.notSpecified": "Non spécifié",
+      "flights.statistics": "Statistiques de vol",
+      "flights.routeDetails": "Détails de la route",
+      "flights.waypointsRecorded": "{{count}} points de passage enregistrés",
+      "flights.startCoordinates": "Coordonnées de départ",
+      "flights.endCoordinates": "Coordonnées d'arrivée",
+      "flights.exported.title": "Vol exporté",
+      "flights.exported.description": "Données de vol exportées en fichier GPX.",
+      "flights.selectDeparture": "Sélectionner le départ",
+      "flights.selectArrival": "Sélectionner l'arrivée",
+      "flights.none": "Aucun",
+      "flights.willBeAdded": "{{name}} sera ajouté",
       
       "upload.title": "Charger un vol",
       "upload.selectFile": "Sélectionner un fichier",
@@ -83,6 +99,7 @@
       "upload.dateRequired": "La date du vol est requise",
       "upload.fileRequired": "Veuillez Charger un fichier KML ou GPX",
       "upload.processing": "Traitement des données de vol...",
+      "upload.selectDate": "Sélectionnez une date",
       "upload.error": "Erreur lors du traitement du fichier",
       "upload.success": "Vol chargé avec succès",
       "upload.successDescription": "Votre vol a été ajouté à votre carnet de vol.",
@@ -124,6 +141,7 @@
       "actions.delete": "Supprimer",
       "actions.edit": "Modifier",
       "actions.export": "Exporter",
+      "actions.back": "Retour",
 
       "share.button": "Partager",
       "share.title": "Partager vos vols et aérodromes",
@@ -157,6 +175,7 @@
 
       "openaip.search": "Recherche OpenAIP",
       "openaip.results": "Résultats OpenAIP",
+      "openaip.addToMyAirfields": "Ajouter à mes aérodromes",
 
       "preferences.title": "Préférences",
       "preferences.general.title": "Général",
@@ -227,5 +246,36 @@
       "statistics.other": "Autres",
       "statistics.mostVisited": "Aérodromes les plus visités",
       "statistics.mostVisitedDesc": "Basé sur les départs et arrivées",
-      "statistics.noAirfields": "Aucun aérodrome ajouté pour le moment"
+      "statistics.noAirfields": "Aucun aérodrome ajouté pour le moment",
+
+      "onboarding.title": "Bienvenue sur Runway Explorer",
+      "onboarding.description": "Configurons quelques préférences pour bien commencer",
+      "onboarding.skip": "Passer",
+      "onboarding.next": "Suivant",
+      "onboarding.complete": "Terminer la configuration",
+
+      "onboarding.aircraftType.title": "Quel type d'aéronef pilotez-vous ?",
+      "onboarding.aircraftType.description": "Cela nous aide à vous fournir des fonctionnalités et des informations pertinentes pour vos activités de vol.",
+      "onboarding.aircraftType.placeholder": "Sélectionnez un type d'aéronef",
+      "onboarding.aircraftType.airplane": "Avion",
+      "onboarding.aircraftType.ultralight": "Ultraléger (ULM)",
+      "onboarding.aircraftType.glider": "Planeur",
+      "onboarding.aircraftType.heli": "Helicoptère",
+
+      "onboarding.location.title": "Trouvez votre base principale",
+      "onboarding.location.description": "Nous utiliserons votre localisation pour trouver les aérodromes à proximité et vous suggérer votre base principale.",
+      "onboarding.location.searching": "Recherche d'aérodromes à proximité…",
+      "onboarding.location.retry": "Réessayer",
+      "onboarding.location.error.geolocation_not_supported": "La géolocalisation n'est pas prise en charge par votre navigateur.",
+      "onboarding.location.error.permission_denied": "L'accès à la localisation a été refusé. Veuillez activer les autorisations de localisation pour trouver les aérodromes à proximité.",
+      "onboarding.location.error.no_airfields_found": "Aucun aérodrome trouvé dans un rayon de 50 NM autour de votre position.",
+      "onboarding.location.error.search_error": "Une erreur s'est produite lors de la recherche d'aérodromes. Veuillez réessayer.",
+      "onboarding.location.manualSearch.description": "Recherchez votre aérodrome de base par nom ou code OACI.",
+      "onboarding.location.manualSearch.placeholder": "ex: LFPG ou Paris",
+      "onboarding.location.manualSearch.minChars": "Entrez au moins 3 caractères pour rechercher",
+
+      "onboarding.homebase.title": "Choisissez votre base principale",
+      "onboarding.homebase.description": "Sélectionnez l'aérodrome à partir duquel vous volez habituellement. Vous pourrez le modifier plus tard dans les paramètres.",
+      "onboarding.homebase.placeholder": "Sélectionnez un aérodrome",
+      "onboarding.homebase.foundCount": "{{count}} aérodrome(s) trouvé(s) près de chez vous"
     }

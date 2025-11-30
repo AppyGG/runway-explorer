@@ -246,5 +246,36 @@
       "statistics.other": "Other",
       "statistics.mostVisited": "Most Visited Airfields",
       "statistics.mostVisitedDesc": "Based on departures and arrivals",
-      "statistics.noAirfields": "No airfields added yet"
+      "statistics.noAirfields": "No airfields added yet",
+
+      "onboarding.title": "Welcome to Runway Explorer",
+      "onboarding.description": "Let's set some preferences to get started",
+      "onboarding.skip": "Skip",
+      "onboarding.next": "Next",
+      "onboarding.complete": "Complete Setup",
+      
+      "onboarding.aircraftType.title": "What type of aircraft do you fly?",
+      "onboarding.aircraftType.description": "This helps us provide relevant features and information for your flying activities.",
+      "onboarding.aircraftType.placeholder": "Select aircraft type",
+      "onboarding.aircraftType.airplane": "Airplane",
+      "onboarding.aircraftType.ultralight": "Ultralight (ULM)",
+      "onboarding.aircraftType.glider": "Glider",
+      "onboarding.aircraftType.heli": "Helicopter",
+
+      "onboarding.location.title": "Find Your Home Base",
+      "onboarding.location.description": "We'll use your location to find nearby airfields and suggest your home base.",
+      "onboarding.location.searching": "Searching for nearby airfields...",
+      "onboarding.location.retry": "Use My Location",
+      "onboarding.location.error.geolocation_not_supported": "Geolocation is not supported by your browser.",
+      "onboarding.location.error.permission_denied": "Location access was denied. Please enable location permissions to find nearby airfields.",
+      "onboarding.location.error.no_airfields_found": "No airfields found within 50 NM of your location.",
+      "onboarding.location.error.search_error": "An error occurred while searching for airfields. Please try again.",
+      "onboarding.location.manualSearch.description": "Search for your home base airfield by name or ICAO code.",
+      "onboarding.location.manualSearch.placeholder": "e.g., LFPG or Paris",
+      "onboarding.location.manualSearch.minChars": "Enter at least 3 characters to search",
+
+      "onboarding.homebase.title": "Select Your Home Base",
+      "onboarding.homebase.description": "Choose the airfield where you usually fly from. You can change this later in settings.",
+      "onboarding.homebase.placeholder": "Select an airfield",
+      "onboarding.homebase.foundCount": "Found {{count}} airfield(s) near you"
     }
