@@ -6,6 +6,8 @@ Runway explorer is a small application for private pilots designed to visualize 
 - **Interactive Map**: View airfields and flight paths with dynamic markers.
 - **Flight Path Management**: Load your previous flight trace (GPX or KML files), auto add airfields, and keep track of where you landed.
 - **Airfield Management**: Manage your airfields bucket list, access detailed information with OpenAIP integration.
+- **Secure API Integration**: OpenAIP data fetched through backend proxy (API key protection).
+- **Share Feature**: Share your flight data with zero-knowledge encryption.
 
 |VFR|Night VFR|
 |---|---|
@@ -21,31 +23,14 @@ A roadmap is available in [ROADMAP.md](ROADMAP.md).
 
 ## Quick Start
 
-1. Install dependencies (recommended: bun):
+### Prerequisites
+
+This application requires a backend server for:
+- **OpenAIP integration**: Secure API key management for airport data
+- **Share feature**: Zero-knowledge encrypted data sharing
+
+Just need to run start-dev.sh
+
 ```bash
-# Using bun (recommended - faster)
-bun install
-
-# Or using npm
-npm install
+./start-dev.sh
 ```
-
-2. Start development server:
-```bash
-bun dev
-# or
-npm run dev
-```
-
-3. Build for production:
-```bash
-bun run build
-# or
-npm run build
-```
-
-## Development
-- Local server: http://localhost:5173
-- Built with modern React patterns and TypeScript
-- Responsive design with Tailwind CSS
-- Pre-configured shadcn/ui components

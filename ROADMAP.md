@@ -17,9 +17,11 @@
 - [ ] Cleanup flights data parsing (altitude max, average speed)
 - [ ] Add flights metadata (aircraft, photos, comments, trace color)
 - [ ] Add flights filters
+- [ ] Add account (to ease sync between devices)
+- [ ] Good responsive for mobile
 
 ## Nice to have
-- [ ] Add account management & cross devices data sync
+- [x] ~~Add account management~~ & cross devices data share
 - [x] Dark mode
-- [ ] Map customization (switch maps, custom layers...)
+- [x] Map customization (switch maps, custom layers...)
 - [ ] Create clean init process

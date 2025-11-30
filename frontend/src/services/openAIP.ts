@@ -3,6 +3,7 @@
  * Documentation: https://docs.openaip.net/
  */
 
+import { AircraftType, TYPE_FILTERS } from '@/store/preferences-store';
 import { Airfield } from '@/types/airfield';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -120,7 +121,7 @@ export const searchAirfields = async (
  * @param lng Longitude of the search center
  * @param distanceNm Maximum distance in nautical miles (default: 5)
  * @param limit Maximum number of results to return (default: 5)
- * @param type Show only airports of the provided types
+ * @param type AircraftType configured in UserPreferences
  * @returns Promise with array of Airfield objects
  */
 export const searchAirfieldsByPosition = async (
@@ -128,15 +129,15 @@ export const searchAirfieldsByPosition = async (
   lng: number,
   distanceNm: number = 5,
   limit: number = 5,
-  type: number[],
+  type: AircraftType
 ): Promise<Airfield[]> => {
   try {
     // Convert nautical miles to meters (1 NM = 1852 meters)
     const distanceMeters = Math.round(distanceNm * 1852);
-    
+
     // Call our backend with position parameters
     const response = await fetch(
-      `${BACKEND_API_URL}/api/airports/search?lat=${lat}&lng=${lng}&dist=${distanceMeters}&limit=${limit}&type=${type}`,
+      `${BACKEND_API_URL}/api/airports/search?lat=${lat}&lng=${lng}&dist=${distanceMeters}&limit=${limit}&type=${TYPE_FILTERS[type]}`,
       {
         headers: {
           'Content-Type': 'application/json'

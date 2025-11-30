@@ -45,13 +45,6 @@ const OnboardingGuide = ({ open, onClose }: OnboardingGuideProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isManualSearching, setIsManualSearching] = useState(false);
 
-  const typeFilters = {
-    'airplane': [0, 2, 3, 8, 13],
-    'ultralight': [0, 2, 3, 6, 11, 13],
-    'glider': [1, 2],
-    'heli': [0, 2, 3, 7]
-  };
-
   // Request geolocation when moving to location step
   useEffect(() => {
     if (step === 'location' && open) {
@@ -73,11 +66,10 @@ const OnboardingGuide = ({ open, onClose }: OnboardingGuideProps) => {
       async (position) => {
         const { latitude, longitude } = position.coords;
         setUserLocation({ lat: latitude, lng: longitude });
-        let activeTypesFilters = typeFilters[aircraftType]; 
         
         try {
           // Search for nearby airfields within 50 NM
-          const airfields = await searchAirfieldsByPosition(latitude, longitude, 50, 10, activeTypesFilters);
+          const airfields = await searchAirfieldsByPosition(latitude, longitude, 50, 10, aircraftType);
           setNearbyAirfields(airfields);
           
           if (airfields.length === 0) {

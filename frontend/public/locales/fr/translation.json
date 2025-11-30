@@ -111,8 +111,8 @@
       "upload.cancel": "Annuler",
       "upload.submit": "Charger le vol",
       
-      "airfield.discovery.departureTitle": "Découvrir l'aérodrome de départ",
-      "airfield.discovery.arrivalTitle": "Découvrir l'aérodrome d'arrivée",
+      "airfield.discovery.departureTitle": "Aérodrome de départ non trouvé",
+      "airfield.discovery.arrivalTitle": "Aérodrome d'arrivée non trouvé",
       "airfield.discovery.departureDescription": "Nous n'avons pas trouvé d'aérodrome de départ correspondant dans votre liste. Souhaitez-vous rechercher des aérodromes à proximité ?",
       "airfield.discovery.arrivalDescription": "Nous n'avons pas trouvé d'aérodrome d'arrivée correspondant dans votre liste. Souhaitez-vous rechercher des aérodromes à proximité ?",
       "airfield.discovery.searching": "Recherche d'aérodromes à proximité...",

@@ -111,8 +111,8 @@
       "upload.cancel": "Cancel",
       "upload.submit": "Upload Flight",
       
-      "airfield.discovery.departureTitle": "Discover Departure Airfield",
-      "airfield.discovery.arrivalTitle": "Discover Arrival Airfield",
+      "airfield.discovery.departureTitle": "Departure Airfield not found",
+      "airfield.discovery.arrivalTitle": "Arrival Airfield not found",
       "airfield.discovery.departureDescription": "We couldn't find a matching departure airfield in your list. Would you like to search for nearby airfields?",
       "airfield.discovery.arrivalDescription": "We couldn't find a matching arrival airfield in your list. Would you like to search for nearby airfields?",
       "airfield.discovery.searching": "Searching for nearby airfields...",

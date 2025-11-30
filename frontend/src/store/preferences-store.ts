@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export type DistanceUnit = 'nm' | 'km' | 'mi';
 export type SpeedUnit = 'kt' | 'kmh' | 'mph';
-export type AircraftType = 'airplane' | 'ultralight' | 'glider' | null;
+export type AircraftType = 'airplane' | 'ultralight' | 'glider' | 'heli' | null;
 
 export interface MapPreferences {
   flightPathColor: string;
@@ -63,6 +63,13 @@ const DEFAULT_UNIT_PREFERENCES: UnitPreferences = {
 const DEFAULT_USER_PREFERENCES: UserPreferences = {
   aircraftType: null,
   hasCompletedOnboarding: false
+};
+
+export const TYPE_FILTERS = {
+  'airplane': [0, 2, 3, 8, 13],
+  'ultralight': [0, 2, 3, 6, 11, 13],
+  'glider': [1, 2],
+  'heli': [0, 2, 3, 7]
 };
 
 export const usePreferencesStore = create<PreferencesState>()(

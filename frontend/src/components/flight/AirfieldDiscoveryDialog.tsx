@@ -10,7 +10,9 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
+  DialogPortal,
+  DialogOverlay
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -20,6 +22,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Loader2, MapPin, Plane } from 'lucide-react';
+import { usePreferencesStore } from '@/store/preferences-store';
 
 interface AirfieldDiscoveryDialogProps {
   open: boolean;
@@ -57,7 +60,8 @@ const AirfieldDiscoveryDialog = ({
         coordinates[0],
         coordinates[1],
         5, // Search within 5nm
-        10 // Get up to 10 results
+        3, // Get up to 10 results,
+        usePreferencesStore.getState().user.aircraftType
       );
       
       setDiscoveredAirfields(airfields);
@@ -107,79 +111,83 @@ const AirfieldDiscoveryDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md z-[1002]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            {type === 'departure' ? <Plane className="h-5 w-5 rotate-45" /> : <Plane className="h-5 w-5 -rotate-45" />}
-            {t(`airfield.discovery.${type}Title`)}
-          </DialogTitle>
-          <DialogDescription>
-            {t(`airfield.discovery.${type}Description`)}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogPortal>
+        <DialogOverlay className="z-[1002]">
+          <DialogContent className="max-w-md z-[1002]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                {type === 'departure' ? <Plane className="h-5 w-5 rotate-45" /> : <Plane className="h-5 w-5 -rotate-45" />}
+                {t(`airfield.discovery.${type}Title`)}
+              </DialogTitle>
+              <DialogDescription>
+                {t(`airfield.discovery.${type}Description`)}
+              </DialogDescription>
+            </DialogHeader>
 
-        {isSearching ? (
-          <div className="flex flex-col items-center justify-center py-8 gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">{t('airfield.discovery.searching')}</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {discoveredAirfields.length > 0 ? (
-              <>
-                <div className="text-sm text-muted-foreground">
-                  {t('airfield.discovery.foundCount', { count: discoveredAirfields.length })}
-                </div>
-                <Select value={selectedAirfieldId || undefined} onValueChange={setSelectedAirfieldId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('airfield.discovery.selectPlaceholder')} />
-                  </SelectTrigger>
-                  <SelectContent className="z-[1003]">
-                    {discoveredAirfields.map((airfield) => {
-                      const distance = getDistance(airfield);
-                      return (
-                        <SelectItem key={airfield.id} value={airfield.id}>
-                          <div className="flex items-center justify-between w-full gap-2">
-                            <span className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              {airfield.name}
-                              {airfield.icao && <span className="text-muted-foreground">({airfield.icao})</span>}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              {distance.toFixed(1)} NM
-                            </span>
-                          </div>
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground">
-                  {t('airfield.discovery.willBeAdded')}
-                </p>
-              </>
+            {isSearching ? (
+              <div className="flex flex-col items-center justify-center py-8 gap-3">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-sm text-muted-foreground">{t('airfield.discovery.searching')}</p>
+              </div>
             ) : (
-              <div className="text-center py-4">
-                <p className="text-sm text-muted-foreground">
-                  {t('airfield.discovery.noAirfieldsFound')}
-                </p>
+              <div className="space-y-4">
+                {discoveredAirfields.length > 0 ? (
+                  <>
+                    <div className="text-sm text-muted-foreground">
+                      {t('airfield.discovery.foundCount', { count: discoveredAirfields.length })}
+                    </div>
+                    <Select value={selectedAirfieldId || undefined} onValueChange={setSelectedAirfieldId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('airfield.discovery.selectPlaceholder')} />
+                      </SelectTrigger>
+                      <SelectContent className="z-[1003]">
+                        {discoveredAirfields.map((airfield) => {
+                          const distance = getDistance(airfield);
+                          return (
+                            <SelectItem key={airfield.id} value={airfield.id}>
+                              <div className="flex items-center justify-between w-full gap-2">
+                                <span className="flex items-center gap-1">
+                                  <MapPin className="h-3 w-3" />
+                                  {airfield.name}
+                                  {airfield.icao && <span className="text-muted-foreground">({airfield.icao})</span>}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {distance.toFixed(1)} NM
+                                </span>
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      {t('airfield.discovery.willBeAdded')}
+                    </p>
+                  </>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-sm text-muted-foreground">
+                      {t('airfield.discovery.noAirfieldsFound')}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        )}
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onSkip}>
-            {t('airfield.discovery.skip')}
-          </Button>
-          <Button 
-            onClick={handleConfirm} 
-            disabled={isSearching || !selectedAirfieldId}
-          >
-            {selectedAirfieldId ? t('airfield.discovery.addAndContinue') : t('airfield.discovery.continue')}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
+            <DialogFooter>
+              <Button variant="outline" onClick={onSkip}>
+                {t('airfield.discovery.skip')}
+              </Button>
+              <Button 
+                onClick={handleConfirm} 
+                disabled={isSearching || !selectedAirfieldId}
+              >
+                {selectedAirfieldId ? t('airfield.discovery.addAndContinue') : t('airfield.discovery.continue')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </DialogOverlay>
+      </DialogPortal>
     </Dialog>
   );
 };
