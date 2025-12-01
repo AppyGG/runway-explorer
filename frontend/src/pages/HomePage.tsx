@@ -86,7 +86,7 @@ function HomePage() {
           <FlightUploadDialog 
             trigger={
               <Button variant="outline" size="sm">
-                <Route className="h-4 w-4 mr-1" />
+                <Plane className="h-4 w-4" />
                 <span className="hidden sm:inline">{t('flights.upload')}</span>
               </Button>
             } 
@@ -102,7 +102,7 @@ function HomePage() {
           open
           onClose={
             () => {
-              console.log('toto')
+              console.log('Onboarding closed')
             }
           }
         >
@@ -119,18 +119,18 @@ function HomePage() {
           className="flex-1 flex flex-col"
         >
           <div className="bg-muted/50 p-2 border-b overflow-x-auto">
-            <TabsList className="w-full grid grid-cols-4 min-w-[400px]">
+            <TabsList className="grid grid-cols-4">
               <TabsTrigger value="map" className="flex items-center gap-1">
-                <MapIcon className="h-4 w-4" /> {t('map.title')}
+                {t('map.title')}
               </TabsTrigger>
               <TabsTrigger value="airfields" className="flex items-center gap-1">
-                <FileSymlink className="h-4 w-4" /> {t('airfields.title')}
+                {t('airfields.title')}
               </TabsTrigger>
               <TabsTrigger value="flights" className="flex items-center gap-1">
-                <Plane className="h-4 w-4" /> {t('flights.title')}
+                {t('flights.title')}
               </TabsTrigger>
               <TabsTrigger value="statistics" className="flex items-center gap-1">
-                <BarChart3 className="h-4 w-4" /> {t('statistics.title')}
+                {t('statistics.title')}
               </TabsTrigger>
             </TabsList>
           </div>

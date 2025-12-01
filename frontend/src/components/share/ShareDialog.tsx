@@ -101,8 +101,8 @@ const ShareDialog = ({ trigger }: ShareDialogProps) => {
       <DialogTrigger asChild>
         {trigger || (
           <Button variant="outline" size="sm">
-            <Share2 className="h-4 w-4 mr-2" />
-            {t('share.button')}
+            <Share2 className="h-4 w-4"/>
+            <span className="hidden sm:inline">{t('share.button')}</span>
           </Button>
         )}
       </DialogTrigger>
