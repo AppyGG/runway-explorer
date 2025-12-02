@@ -292,7 +292,7 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
         onAirfieldSelected={handleArrivalAirfieldDiscovered}
         onSkip={handleSkipDiscovery}
       />
-      
+    
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
@@ -302,7 +302,7 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-lg z-[1000]">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>{t('upload.title')}</DialogTitle>
           <DialogDescription>
@@ -381,7 +381,7 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0 z-[1001]" align="start">
+                        <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
                             mode="single"
                             selected={field.value}
@@ -413,7 +413,7 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
                               <SelectValue placeholder={t('flights.selectDeparture')} />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent className="z-[1002]">
+                          <SelectContent>
                             <SelectItem value="null">{t('flights.none')}</SelectItem>
                             {airfields.map(airfield => (
                               <SelectItem key={airfield.id} value={airfield.id}>
@@ -448,7 +448,7 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
                               <SelectValue placeholder={t('flights.selectArrival')} />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent className="z-[1002]">
+                          <SelectContent>
                             <SelectItem value="null">{t('flights.none')}</SelectItem>
                             {airfields.map(airfield => (
                               <SelectItem key={airfield.id} value={airfield.id}>

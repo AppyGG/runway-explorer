@@ -220,7 +220,7 @@ const SharedViewPage = () => {
       ) : (
         // Desktop view with side-by-side panels
         <div className="flex-1 grid grid-cols-3 gap-4 p-4">
-          <div className="z-[1] col-span-2 h-[calc(100vh-100px)]">
+          <div className="col-span-2 h-[calc(100vh-100px)]">
             <MapView 
               airfields={sharedData.airfields}
               flightPaths={sharedData.flightPaths}

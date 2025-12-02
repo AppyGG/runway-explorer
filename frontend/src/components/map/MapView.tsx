@@ -385,7 +385,6 @@ const MapView = ({
         center={[defaultCenter[0], defaultCenter[1]]} 
         zoom={9} 
         style={{ height: '100%', width: '100%' }}
-        className='z-5'
         scrollWheelZoom={false}
         smoothWheelZoom={true} // Smooth scroll plugin
         smoothSensitivity={1}

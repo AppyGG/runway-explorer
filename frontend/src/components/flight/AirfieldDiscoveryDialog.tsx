@@ -112,8 +112,8 @@ const AirfieldDiscoveryDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
-        <DialogOverlay className="z-[1002]">
-          <DialogContent className="max-w-md z-[1002]">
+        <DialogOverlay>
+          <DialogContent>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 {type === 'departure' ? <Plane className="h-5 w-5 rotate-45" /> : <Plane className="h-5 w-5 -rotate-45" />}
@@ -140,7 +140,7 @@ const AirfieldDiscoveryDialog = ({
                       <SelectTrigger>
                         <SelectValue placeholder={t('airfield.discovery.selectPlaceholder')} />
                       </SelectTrigger>
-                      <SelectContent className="z-[1003]">
+                      <SelectContent>
                         {discoveredAirfields.map((airfield) => {
                           const distance = getDistance(airfield);
                           return (
