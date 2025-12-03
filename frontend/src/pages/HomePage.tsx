@@ -136,8 +136,8 @@ function HomePage() {
           </div>
           
           <TabsContent value="map" className="flex-1 p-0 m-0">
-            <div className="h-full">
-              <MapView 
+            <div className="h-[calc(100vh-110px)]">
+              <MapView
                 onMarkerClick={handleAirfieldSelect} 
                 onFlightPathClick={handleFlightSelect}
                 selectedFlightPath={selectedFlightPath}

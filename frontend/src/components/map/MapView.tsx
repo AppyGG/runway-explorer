@@ -321,9 +321,10 @@ const MapView = ({
        {/* Map Controls - positioned absolutely over the map */}
         <div className="absolute top-2 right-2 z-[500] flex flex-col gap-2">
           {/* Heatmap toggle button */}
-          <Button 
+          <Button
             variant={mapPreferences.showHeatmap ? "default" : "secondary"}
-            size="sm" 
+            size="sm"
+            className="w-100"
             onClick={toggleHeatmap}
             title={t('map.heatmap.tooltip')}
           >
@@ -332,9 +333,10 @@ const MapView = ({
           </Button>
           
           {/* Auto-zoom button */}
-          <Button 
+          <Button
             variant={autoZoomMode !== null ? "default" : "secondary"}
-            size="sm" 
+            size="sm"
+            className="w-100"
             onClick={toggleAutoZoom}
             title={t('map.autoZoom.tooltip')}
           >
@@ -344,9 +346,10 @@ const MapView = ({
           
           {/* Map Style Selector */}
           <div className="relative" ref={stylePopupRef}>
-            <Button 
-              variant="secondary" 
-              size="sm" 
+            <Button
+              variant="secondary"
+              size="sm"
+              className="w-100"
               onClick={() => setStylePopupVisible(!stylePopupVisible)}
             >
               <Layers className="h-4 w-4 mr-1" />
