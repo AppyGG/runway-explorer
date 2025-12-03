@@ -60,6 +60,7 @@
       "flights.avgSpeed": "Avg Speed",
       "flights.export": "Export as GPX",
       "flights.profile": "Flight Profile",
+      "flights.countLabel": "flights",
       "flights.altitudeProfile": "Altitude Profile",
       "flights.speedProfile": "Speed Profile",
       "flights.altitude": "Altitude",
@@ -213,6 +214,7 @@
       "preferences.colors.orange": "Orange",
       "preferences.colors.purple": "Purple",
       "preferences.colors.black": "Black",
+      
       "units.nm": "NM",
       "units.km": "km",
       "units.mi": "mi",

@@ -182,10 +182,6 @@ function HomePage() {
           
           <TabsContent value="flights" className="flex-1 p-0 m-0">
             <div className="h-full p-2">
-              <div className="flex mb-2 justify-between">
-                <h2 className="text-lg font-semibold">{t('flights.title')}</h2>
-                <FlightUploadDialog onUploadComplete={handleFlightUploadComplete} />
-              </div>
               <FlightList
                 onSelectFlight={handleFlightSelect}
                 className="h-[calc(100%-40px)]"
@@ -203,7 +199,7 @@ function HomePage() {
         // Desktop view with side-by-side panels
         <div className="flex-1 grid grid-cols-3 gap-4 p-4">
           <div className="col-span-2 h-[calc(100vh-100px)]">
-            <MapView 
+            <MapView
               onMarkerClick={handleAirfieldSelect}
               onFlightPathClick={handleFlightSelect}
               selectedFlightPath={selectedFlightPath}

@@ -25,6 +25,7 @@ import {
 import { calculateFlightStatistics } from '@/lib/flight-parser';
 import { usePreferencesStore } from '@/store/preferences-store';
 import { formatDistance } from '@/lib/unit-conversion';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface FlightListProps {
   flights?: FlightPath[]; // Optional: for shared view
@@ -41,6 +42,7 @@ const FlightList = ({
   className = '',
   readOnly = false
 }: FlightListProps) => {
+  const isMobile = useIsMobile();
   const storeData = useAirfieldStore();
   
   // Use props if provided (shared view), otherwise use store (normal view)
@@ -61,7 +63,7 @@ const FlightList = ({
   const getAirfieldName = (id?: string) => {
     if (!id) return 'Unknown';
     const airfield = airfields.find(a => a.id === id);
-    return airfield ? airfield.name : 'Unknown';
+    return airfield ? (isMobile ? airfield.icao : airfield.name) : 'Unknown';
   };
   
   const handleSelectFlight = (flight: FlightPath) => {
@@ -99,7 +101,7 @@ const FlightList = ({
                     <div className="flex justify-between items-center p-3 pb-2">
                       <CardTitle className="text-base">{flight.name}</CardTitle>
                       <span className="text-xs text-muted-foreground">
-                        {flight.fileType} file
+                        {flight.fileType}
                       </span>
                     </div>
                     <div className="px-3 grid grid-flow-col grid-rows-2 gap1">
@@ -145,7 +147,7 @@ const FlightList = ({
       </CardContent>
       <div className="p-3 border-t flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-            {filteredFlights.length} flights
+            {filteredFlights.length} {t('flights.countLabel')}
         </div>
       </div>
     </Card>
