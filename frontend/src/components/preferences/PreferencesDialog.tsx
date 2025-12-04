@@ -68,7 +68,7 @@ const PreferencesDialog = ({ trigger }: PreferencesDialogProps) => {
     resetMapPreferences();
     resetUnitPreferences();
     setLocalPreferences({
-      flightPathColor: '#d53f94',
+      flightPathColor: '#3f9ed5',
       selectedFlightPathColor: '#ff0000',
       flightPathWidth: 4,
       selectedFlightPathWidth: 4,

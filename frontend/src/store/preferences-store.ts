@@ -51,8 +51,8 @@ const DEFAULT_MAP_PREFERENCES: MapPreferences = {
   fadeOtherFlightPaths: true,
   otherFlightPathsOpacity: 0.3,
   showHeatmap: false,
-  heatmapIntensity: 0.5,
-  heatmapRadius: 15
+  heatmapIntensity: 0.4,
+  heatmapRadius: 5
 };
 
 const DEFAULT_UNIT_PREFERENCES: UnitPreferences = {

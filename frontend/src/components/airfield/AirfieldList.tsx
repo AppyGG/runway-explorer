@@ -457,13 +457,11 @@ const AirfieldList = ({
                   <div className="flex flex-col items-end gap-1">
                     {searchMode === 'local' ? (
                       <div className='flex items-center gap-1'>
-                      {airfield.id === homeAirfieldId && (
-                        <Badge variant="default" className="bg-primary text-primary-foreground">
-                          <Home className="h-3 w-3" />
+                      {airfield.id === homeAirfieldId ? (
+                        <Badge variant="outline" className="bg-primary text-primary-foreground">
+                          <Home className="h-4 w-4" />
                         </Badge>
-                      )}
-
-                      {airfield.visited ? (
+                      ) : airfield.visited ? (
                         <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">{t('airfields.status.visited')}</Badge>
                       ) : airfield.planned ? (
                         <Badge variant="outline" className="border-amber-500 text-amber-700">{t('airfields.status.planned')}</Badge>
