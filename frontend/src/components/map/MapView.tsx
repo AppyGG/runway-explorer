@@ -434,27 +434,61 @@ const MapView = ({
           const color = isSelected ? mapPreferences.selectedFlightPathColor : mapPreferences.flightPathColor;
           const weight = isSelected ? mapPreferences.selectedFlightPathWidth : mapPreferences.flightPathWidth;
           
+          // Check if we need to render an invisible hitbox polyline
+          const needsHitbox = weight <= 10;
+          const hitboxWeight = 15;
+          
+          // Common event handlers
+          const clickHandler = () => handleFlightPathClick(flightPath);
+          
           return (
-            <Polyline
-              key={flightPath.id}
-              positions={flightPath.coordinates}
-              pathOptions={{
-                color: color,
-                weight: weight,
-                opacity: opacity,
-                interactive: true,
-                bubblingMouseEvents: false
-              }}
-              eventHandlers={{
-                click: () => handleFlightPathClick(flightPath)
-              }}
-              interactive={true}
-              bubblingMouseEvents={false}
-            >
-              <Tooltip direction="top">
-                {flightPath.name} ({flightPath.date})
-              </Tooltip>
-            </Polyline>
+            <div key={flightPath.id}>
+              {/* Invisible hitbox polyline for better click detection on thin lines */}
+              {needsHitbox && (
+                <Polyline
+                  positions={flightPath.coordinates}
+                  pathOptions={{
+                    color: color,
+                    weight: hitboxWeight,
+                    opacity: 0,
+                    interactive: true,
+                    bubblingMouseEvents: false
+                  }}
+                  eventHandlers={{
+                    click: clickHandler
+                  }}
+                  interactive={true}
+                  bubblingMouseEvents={false}
+                >
+                  <Tooltip direction="top">
+                    {flightPath.name} ({flightPath.date})
+                  </Tooltip>
+                </Polyline>
+              )}
+              
+              {/* Visible polyline */}
+              <Polyline
+                positions={flightPath.coordinates}
+                pathOptions={{
+                  color: color,
+                  weight: weight,
+                  opacity: opacity,
+                  interactive: true,
+                  bubblingMouseEvents: false
+                }}
+                eventHandlers={needsHitbox ? {} : {
+                  click: clickHandler
+                }}
+                interactive={true}
+                bubblingMouseEvents={false}
+              >
+                {!needsHitbox && (
+                  <Tooltip direction="top">
+                    {flightPath.name} ({flightPath.date})
+                  </Tooltip>
+                )}
+              </Polyline>
+            </div>
           );
         })}
         
