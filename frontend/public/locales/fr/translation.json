@@ -111,6 +111,8 @@
       "upload.addError": "Échec de l'ajout du vol à votre collection. Veuillez réessayer.",
       "upload.cancel": "Annuler",
       "upload.submit": "Charger le vol",
+      "upload.duplicateFile.title": "Fichier déjà importé",
+      "upload.duplicateFile.description": "Ce fichier a déjà été importé le {{date}}.",
       
       "airfield.discovery.departureTitle": "Aérodrome de départ non trouvé",
       "airfield.discovery.arrivalTitle": "Aérodrome d'arrivée non trouvé",

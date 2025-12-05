@@ -111,6 +111,8 @@
       "upload.addError": "Failed to add flight to your collection. Please try again.",
       "upload.cancel": "Cancel",
       "upload.submit": "Upload Flight",
+      "upload.duplicateFile.title": "File Already Imported",
+      "upload.duplicateFile.description": "This file has already been imported on {{date}}.",
       
       "airfield.discovery.departureTitle": "Departure Airfield not found",
       "airfield.discovery.arrivalTitle": "Arrival Airfield not found",

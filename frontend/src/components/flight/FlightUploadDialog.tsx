@@ -39,7 +39,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { format } from 'date-fns';
-import { Upload, CalendarIcon, Loader2 } from 'lucide-react';
+import { Upload, CalendarIcon, Loader2, AlertTriangle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -70,7 +70,8 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
   const [open, setOpen] = useState(false);
   const [flightPreview, setFlightPreview] = useState<FlightPath | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { airfields, addFlightPath, updateAirfield, addAirfield } = useAirfieldStore();
+  const [duplicateFile, setDuplicateFile] = useState<{ name: string; date: string } | null>(null);
+  const { airfields, flightPaths, addFlightPath, updateAirfield, addAirfield } = useAirfieldStore();
   const { toast } = useToast();
   const { t } = useTranslation();
   
@@ -89,9 +90,43 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
     }
   });
 
+  // Reset all state when dialog is closed
+  const resetDialogState = () => {
+    form.reset({
+      date: new Date(),
+      name: ''
+    });
+    setFlightPreview(null);
+    setDuplicateFile(null);
+    setIsLoading(false);
+    setDiscoveredDepartureAirfield(null);
+    setDiscoveredArrivalAirfield(null);
+    setDepartureCoordinates(null);
+    setArrivalCoordinates(null);
+    setDiscoveryStep('none');
+  };
+
+  // Handle dialog open/close
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      resetDialogState();
+    }
+  };
+
   const handleFileChange = async (file: File) => {
     setIsLoading(true);
+    setDuplicateFile(null);
     try {
+      // Check if file has already been imported
+      const existingFlight = flightPaths.find(f => f.fileName === file.name);
+      if (existingFlight) {
+        setDuplicateFile({ name: file.name, date: existingFlight.date });
+        form.reset();
+        setIsLoading(false);
+        return;
+      }
+      
       const flightData = await parseFlightFile(file);
       
       if (!flightData) {
@@ -254,15 +289,8 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
         }, 0);
       }
       
-      // Reset state
+      // Close dialog (reset will be handled by handleOpenChange)
       setOpen(false);
-      form.reset();
-      setFlightPreview(null);
-      setDiscoveredDepartureAirfield(null);
-      setDiscoveredArrivalAirfield(null);
-      setDepartureCoordinates(null);
-      setArrivalCoordinates(null);
-      setDiscoveryStep('none');
     } catch (error) {
       toast({
         title: t('upload.error'),
@@ -293,7 +321,7 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
         onSkip={handleSkipDiscovery}
       />
     
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {trigger || (
           <Button size="sm" className="gap-1">
@@ -334,6 +362,14 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
                   <FormDescription>
                     {t('upload.formats')}
                   </FormDescription>
+                  {duplicateFile && (
+                    <div className="flex items-start gap-2 mt-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+                      <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                        {t('upload.duplicateFile.description', { name: duplicateFile.name, date: duplicateFile.date })}
+                      </p>
+                    </div>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -474,7 +510,7 @@ const FlightUploadDialog = ({ trigger, onUploadComplete }: FlightUploadDialogPro
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => setOpen(false)}
+                onClick={() => handleOpenChange(false)}
               >
                 {t('upload.cancel')}
               </Button>
