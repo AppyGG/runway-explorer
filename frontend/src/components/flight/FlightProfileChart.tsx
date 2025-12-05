@@ -174,7 +174,7 @@ const FlightProfileChart = ({ flight }: FlightProfileChartProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={200}>
           <LineChart
             data={chartData}
             margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
@@ -182,6 +182,7 @@ const FlightProfileChart = ({ flight }: FlightProfileChartProps) => {
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis
               dataKey="distance"
+              allowDecimals={false}
               label={{ value: `${t('flights.distance')} (${getDistanceUnitLabel(units.distance)})`, position: 'insideBottom', offset: -5 }}
               tick={{ fontSize: 12 }}
               className="text-muted-foreground"
