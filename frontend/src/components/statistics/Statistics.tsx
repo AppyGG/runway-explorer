@@ -37,11 +37,13 @@ const Statistics = ({ className = '' }: StatisticsProps) => {
     // Flight statistics
     const totalFlights = flightPaths.length;
     let totalDistance = 0;
-    let totalDuration = 0;
+    let totalDuration = 0; // in hours
+    let currentYearDuration = 0; // in hours
     let maxAltitude = 0;
     let totalAltitude = 0;
     let flightCount = 0;
 
+    const currentYear = new Date().getFullYear().toString();
     const flightsByYear: Record<string, number> = {};
     const flightsByMonth: Record<string, number> = {};
     const distanceByYear: Record<string, number> = {};
@@ -49,7 +51,7 @@ const Statistics = ({ className = '' }: StatisticsProps) => {
     flightPaths.forEach(flight => {
       const flightStats = calculateFlightStatistics(flight);
       totalDistance += flightStats.totalDistance;
-      totalDuration += flightStats.duration;
+      totalDuration += flightStats.duration; // duration is in hours
       
       if (flightStats.maxAltitude > maxAltitude) {
         maxAltitude = flightStats.maxAltitude;
@@ -64,6 +66,11 @@ const Statistics = ({ className = '' }: StatisticsProps) => {
       const year = flight.date.substring(0, 4);
       flightsByYear[year] = (flightsByYear[year] || 0) + 1;
       distanceByYear[year] = (distanceByYear[year] || 0) + flightStats.totalDistance;
+      
+      // Add to current year duration if applicable
+      if (year === currentYear) {
+        currentYearDuration += flightStats.duration;
+      }
 
       // Group by month
       const month = flight.date.substring(0, 7);
@@ -117,6 +124,8 @@ const Statistics = ({ className = '' }: StatisticsProps) => {
       totalFlights,
       totalDistance,
       totalDuration,
+      currentYear,
+      currentYearDuration,
       maxAltitude,
       avgAltitude,
       avgFlightDistance,
@@ -133,16 +142,9 @@ const Statistics = ({ className = '' }: StatisticsProps) => {
     };
   }, [flightPaths, airfields, homeAirfieldId]);
 
-  // Format duration to hours and minutes
-  const formatDuration = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours}h ${minutes}m`;
-  };
-
   // Format duration to decimal hours
-  const formatHours = (seconds: number) => {
-    return (seconds / 3600).toFixed(1);
+  const formatHours = (hours: number) => {
+    return hours.toFixed(1);
   };
 
   return (
@@ -200,6 +202,11 @@ const Statistics = ({ className = '' }: StatisticsProps) => {
                 <div className="text-2xl font-bold">
                   {formatDistance(stats.totalDistance, units.distance)}
                 </div>
+                <div className="text-xs text-muted-foreground">
+                  {stats.currentYearDuration > 0 && (
+                    <span>{stats.currentYear}: {formatDistance(stats.distanceByYear[stats.currentYear], units.distance)}</span>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -215,7 +222,9 @@ const Statistics = ({ className = '' }: StatisticsProps) => {
                   {formatHours(stats.totalDuration)}h
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {formatDuration(stats.totalDuration)}
+                  {stats.currentYearDuration > 0 && (
+                    <span>{stats.currentYear}: {formatHours(stats.currentYearDuration)}h</span>
+                  )}
                 </div>
               </CardContent>
             </Card>
