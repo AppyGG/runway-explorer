@@ -441,11 +441,15 @@ const MapView = ({
               pathOptions={{
                 color: color,
                 weight: weight,
-                opacity: opacity
+                opacity: opacity,
+                interactive: true,
+                bubblingMouseEvents: false
               }}
               eventHandlers={{
                 click: () => handleFlightPathClick(flightPath)
               }}
+              interactive={true}
+              bubblingMouseEvents={false}
             >
               <Tooltip direction="top">
                 {flightPath.name} ({flightPath.date})

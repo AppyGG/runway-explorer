@@ -132,3 +132,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Remove focus outline from Leaflet polylines and interactive elements */
+.leaflet-interactive:focus {
+  outline: none !important;
+}
+
+.leaflet-interactive:focus-visible {
+  outline: none !important;
+}
+
+/* Remove the black border box around selected paths */
+path.leaflet-interactive:focus {
+  outline: none !important;
+}

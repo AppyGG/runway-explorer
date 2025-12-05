@@ -35,6 +35,7 @@ function HomePage() {
   const [selectedAirfield, setSelectedAirfield] = useState<Airfield | null>(null);
   const [selectedFlightPath, setSelectedFlightPath] = useState<FlightPath | null>(null);
   const [activeTab, setActiveTab] = useState<string>("map");
+  const [rightPanelTab, setRightPanelTab] = useState<string>("airfields");
   const [showOnboarding, setShowOnboarding] = useState(false);
   const { t } = useTranslation();
   
@@ -60,6 +61,9 @@ function HomePage() {
     
     if (isMobile) {
       setActiveTab("map");
+    } else {
+      // Switch to flights tab in the right panel on desktop
+      setRightPanelTab("flights");
     }
   };
   
@@ -207,7 +211,7 @@ function HomePage() {
             />
           </div>
           <div className="col-span-1 h-[calc(100vh-100px)]">
-            <Tabs defaultValue="airfields" className="h-full flex flex-col">
+            <Tabs value={rightPanelTab} onValueChange={setRightPanelTab} className="h-full flex flex-col">
               <TabsList className="w-full grid grid-cols-3">
                 <TabsTrigger value="airfields" className="flex items-center gap-1">
                   <TowerControl className="h-4 w-4" /> {t('airfields.title')}
