@@ -162,10 +162,3 @@ path.leaflet-interactive:focus {
 .plane-marker-icon img {
   filter: drop-shadow(0 2px 4px rgba(27, 27, 27, 0.9));
 }
-
-.dark .plane-marker-icon img {
-  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.9));
-}
-.dark .plane-marker-icon svg {
-  stroke: white;
-}

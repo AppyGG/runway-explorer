@@ -48,7 +48,6 @@ const FlightList = ({
   // Use props if provided (shared view), otherwise use store (normal view)
   const flightPaths = propsFlights || storeData.flightPaths;
   const airfields = propsAirfields || storeData.airfields;
-  const deleteFlightPath = storeData.deleteFlightPath;
   const [searchQuery, setSearchQuery] = useState('');
   const { t } = useTranslation();
   const { units } = usePreferencesStore();
@@ -73,7 +72,7 @@ const FlightList = ({
   };
   
   return (
-    <Card className={`flex flex-col h-full overflow-hidden ${className}`}>
+    <Card className={`flex flex-col h-full overflow-hidden ${className} flight-list-card`}>
       <div className="px-3 py-3">
         <div className='relative flex-1'>
           <Search className="w-4 h-4 absolute left-2.5 top-2.5 text-muted-foreground" />
@@ -86,10 +85,9 @@ const FlightList = ({
             />
           </div>
       </div>
-      <CardContent className="p-3 flex-grow pb-0">
+      <CardContent className="p-3 flex flex-col h-full max-h-full pb-0">
         {filteredFlights.length > 0 ? (
-          <ScrollArea className="overflow-hidden h-full max-h-[calc(100vh-280px)]">
-            <div className="space-y-3">
+          <ScrollArea className="flex-1 overflow-hidden h-full max-h-[calc(100vh-270px)]">
               {filteredFlights.map(flight => {
                 const stats = calculateFlightStatistics(flight);
                 return (
@@ -128,9 +126,7 @@ const FlightList = ({
                   </Card>
                 );
               })}
-            </div>
           </ScrollArea>
-          
         ) : (
           <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground p-4">
             <Plane className="h-16 w-16 mb-4 opacity-20" />

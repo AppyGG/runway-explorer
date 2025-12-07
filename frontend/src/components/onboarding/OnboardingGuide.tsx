@@ -69,7 +69,7 @@ const OnboardingGuide = ({ open, onClose }: OnboardingGuideProps) => {
         
         try {
           // Search for nearby airfields within 50 NM
-          const airfields = await searchAirfieldsByPosition(latitude, longitude, 50, 10, aircraftType);
+          const airfields = await searchAirfieldsByPosition(latitude, longitude, 50, 20, aircraftType);
           setNearbyAirfields(airfields);
           
           if (airfields.length === 0) {

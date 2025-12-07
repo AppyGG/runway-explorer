@@ -318,9 +318,7 @@ const MapView = ({
   };
 
   // Calculate bearing (angle) between two points
-  const calculateBearing = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const iconBaseRotate = 45;
-    
+  const calculateBearing = (lat1: number, lon1: number, lat2: number, lon2: number): number => {   
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const lat1Rad = lat1 * Math.PI / 180;
     const lat2Rad = lat2 * Math.PI / 180;
@@ -330,14 +328,14 @@ const MapView = ({
               Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
     
     const bearing = Math.atan2(y, x) * 180 / Math.PI;
-    return (bearing + 360 + -iconBaseRotate) % 360; // Normalize to 0-360
+    return (bearing + 360) % 360; // Normalize to 0-360
   };
 
   // Get rotated plane icon based on bearing
   const getRotatedPlaneIcon = (bearing: number) => {
     return new DivIcon({
       html: `<div style="transform: rotate(${bearing}deg); width: 32px; height: 32px;">
-               <img src="/pins/plane_icon_blue.svg" style="width: 100%; height: 100%;" />
+               <img src="/pins/small_plane_icon.svg" style="width: 100%; height: 100%;" />
              </div>`,
       iconSize: [32, 32], 
       iconAnchor: [16, 16],
