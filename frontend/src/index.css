@@ -146,3 +146,26 @@
 path.leaflet-interactive:focus {
   outline: none !important;
 }
+
+/* Plane marker styling */
+.plane-marker-icon {
+  background: transparent !important;
+  border: none !important;
+  transition: opacity 0.2s ease-out;
+}
+
+.plane-marker-icon div {
+  transition: transform 0.15s ease-out;
+  transform-origin: center center;
+}
+
+.plane-marker-icon img {
+  filter: drop-shadow(0 2px 4px rgba(27, 27, 27, 0.9));
+}
+
+.dark .plane-marker-icon img {
+  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.9));
+}
+.dark .plane-marker-icon svg {
+  stroke: white;
+}

@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap, Polyline } from 'react-leaflet';
-import { Icon, latLngBounds, LatLng } from 'leaflet';
+import { Icon, latLngBounds, LatLng, DivIcon } from 'leaflet';
 import { useAirfieldStore } from '@/store/airfield-store';
 import { usePreferencesStore } from '@/store/preferences-store';
+import { useMapInteractionStore } from '@/store/map-interaction-store';
 import { Airfield, FlightPath } from '@/types/airfield';
 import { Button } from '@/components/ui/button';
 import { Layers, Maximize2, Flame } from 'lucide-react';
@@ -85,6 +86,12 @@ const homeIcon = new Icon({
   shadowSize: [38, 38]
 });
 
+const planeIcon = new Icon({
+  iconUrl: '/pins/plane_icon_blue.svg',
+  iconSize: [32, 32], 
+  iconAnchor: [16, 16]
+});
+
 // Component to recenter map when home airfield changes
 const MapRecenter = ({ airfield }: { airfield: Airfield | null }) => {
   const map = useMap();
@@ -140,6 +147,7 @@ const MapView = ({
 }: MapViewProps) => {
   const storeData = useAirfieldStore();
   const { map: mapPreferences } = usePreferencesStore();
+  const { hoveredWaypointIndex } = useMapInteractionStore();
   
   // Use props if provided (shared view), otherwise use store (normal view)
   const airfields = propsAirfields || storeData.airfields;
@@ -308,6 +316,69 @@ const MapView = ({
     if (autoZoomMode === 'airfields') return t('map.autoZoom.airfields');
     return t('map.autoZoom.flightPaths');
   };
+
+  // Calculate bearing (angle) between two points
+  const calculateBearing = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const iconBaseRotate = 45;
+    
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const lat1Rad = lat1 * Math.PI / 180;
+    const lat2Rad = lat2 * Math.PI / 180;
+    
+    const y = Math.sin(dLon) * Math.cos(lat2Rad);
+    const x = Math.cos(lat1Rad) * Math.sin(lat2Rad) -
+              Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
+    
+    const bearing = Math.atan2(y, x) * 180 / Math.PI;
+    return (bearing + 360 + -iconBaseRotate) % 360; // Normalize to 0-360
+  };
+
+  // Get rotated plane icon based on bearing
+  const getRotatedPlaneIcon = (bearing: number) => {
+    return new DivIcon({
+      html: `<div style="transform: rotate(${bearing}deg); width: 32px; height: 32px;">
+               <img src="/pins/plane_icon_blue.svg" style="width: 100%; height: 100%;" />
+             </div>`,
+      iconSize: [32, 32], 
+      iconAnchor: [16, 16],
+      className: 'plane-marker-icon'
+    });
+  };
+
+  // Calculate plane rotation angle for hovered waypoint
+  const planeRotation = useMemo(() => {
+    if (!selectedFlightPath || hoveredWaypointIndex === null || !selectedFlightPath.waypoints) {
+      return 0;
+    }
+    
+    const waypoints = selectedFlightPath.waypoints;
+    const currentWaypoint = waypoints[hoveredWaypointIndex];
+    
+    // Use next waypoint if available, otherwise use previous (and keep same bearing)
+    let targetWaypoint;
+    
+    if (hoveredWaypointIndex < waypoints.length - 1) {
+      targetWaypoint = waypoints[hoveredWaypointIndex + 1];
+    } else if (hoveredWaypointIndex > 0) {
+      // Use previous waypoint but calculate from previous to current to maintain direction
+      const prevWaypoint = waypoints[hoveredWaypointIndex - 1];
+      return calculateBearing(
+        prevWaypoint.lat,
+        prevWaypoint.lng,
+        currentWaypoint.lat,
+        currentWaypoint.lng
+      );
+    } else {
+      return 0;
+    }
+    
+    return calculateBearing(
+      currentWaypoint.lat,
+      currentWaypoint.lng,
+      targetWaypoint.lat,
+      targetWaypoint.lng
+    );
+  }, [selectedFlightPath, hoveredWaypointIndex]);
 
   // Toggle heatmap
   const toggleHeatmap = () => {
@@ -518,6 +589,20 @@ const MapView = ({
             </Popup>
           </Marker>
         ))}
+
+        {/* Hovered waypoint marker */}
+        {selectedFlightPath && hoveredWaypointIndex !== null && 
+         selectedFlightPath.waypoints && 
+         hoveredWaypointIndex < selectedFlightPath.waypoints.length && (
+          <Marker
+            position={[
+              selectedFlightPath.waypoints[hoveredWaypointIndex].lat,
+              selectedFlightPath.waypoints[hoveredWaypointIndex].lng
+            ]}
+            icon={getRotatedPlaneIcon(planeRotation)}
+            zIndexOffset={1000}
+          />
+        )}
 
         {/* Auto fit to selected flight path */}
         {selectedFlightPath && <FlightPathFit flightPath={selectedFlightPath} />}

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useMapInteractionStore } from '@/store/map-interaction-store';
 import {
   LineChart,
   Line,
@@ -32,6 +33,7 @@ interface ChartDataPoint {
 const FlightProfileChart = ({ flight }: FlightProfileChartProps) => {
   const { t } = useTranslation();
   const { units } = usePreferencesStore();
+  const { setHoveredWaypointIndex } = useMapInteractionStore();
   
   // Prepare chart data from flight coordinates
   const chartData = useMemo(() => {
@@ -178,6 +180,14 @@ const FlightProfileChart = ({ flight }: FlightProfileChartProps) => {
           <LineChart
             data={chartData}
             margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
+            onMouseMove={(data) => {
+              if (data && data.activeTooltipIndex !== undefined) {
+                setHoveredWaypointIndex(data.activeTooltipIndex);
+              }
+            }}
+            onMouseLeave={() => {
+              setHoveredWaypointIndex(null);
+            }}
           >
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis
