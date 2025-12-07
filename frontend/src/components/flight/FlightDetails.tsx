@@ -17,6 +17,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { 
   Plane, 
@@ -353,7 +354,7 @@ const FlightDetails = ({
           </Card>
         </div>
         
-        <div className="flex justify-between pb-6">
+        <div className="flex justify-between pb-3">
           <Button variant="outline" onClick={onClose}>
             <ChevronLeft className="h-4 w-4 mr-1" />
             {t('actions.back')}
@@ -384,8 +385,8 @@ const FlightDetails = ({
   if (isSheet && isMobile) {
     return (
       <Sheet open={sheetOpen} onOpenChange={(open) => !open && handleSheetClose()}>
-        <SheetContent side="bottom" className="h-[85vh]">
-          <SheetHeader className="mb-4">
+        <SheetContent side="bottom" className="h-[90vh] flex flex-col py-3 px-2">
+          <SheetHeader className="mb-4 flex-shrink-0 px-3">
             {flight && isEditingName ? (
               <div className="flex items-center gap-2">
                 <Input
@@ -419,7 +420,9 @@ const FlightDetails = ({
               {t('flights.details')}
             </SheetDescription>
           </SheetHeader>
-          {content}
+          <ScrollArea className="flex-1 px-3">
+            {content}
+          </ScrollArea>
         </SheetContent>
       </Sheet>
     );
