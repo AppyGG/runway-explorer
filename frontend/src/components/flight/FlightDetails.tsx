@@ -208,25 +208,21 @@ const FlightDetails = ({
         
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <Card>
-            <CardHeader className="py-3">
-              <CardTitle className="text-sm font-medium flex items-center gap-1.5">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
                 <Ruler className="h-4 w-4 text-primary" />
                 {t('flights.distance')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="py-1">
+              </div>
               <div className="text-base">{formatDistance(stats.totalDistance, units.distance)}</div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardHeader className="py-3">
-              <CardTitle className="text-sm font-medium flex items-center gap-1.5">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
                 <ArrowUpRight className="h-4 w-4 text-primary" />
                 {t('flights.departure')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="py-1">
+              </div>
               {departureAirfield ? (
                 <div className="text-base font-semibold truncate">
                   {departureAirfield.name}
@@ -239,13 +235,11 @@ const FlightDetails = ({
           </Card>
           
           <Card>
-            <CardHeader className="py-3">
-              <CardTitle className="text-sm font-medium flex items-center gap-1.5">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
                 <ArrowDownRight className="h-4 w-4 text-primary" />
                 {t('flights.arrival')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="py-1">
+              </div>
               {arrivalAirfield ? (
                 <div className="text-base font-semibold truncate">
                   {arrivalAirfield.name}
@@ -359,7 +353,7 @@ const FlightDetails = ({
           </Card>
         </div>
         
-        <div className="flex justify-between">
+        <div className="flex justify-between pb-6">
           <Button variant="outline" onClick={onClose}>
             <ChevronLeft className="h-4 w-4 mr-1" />
             {t('actions.back')}
@@ -371,9 +365,9 @@ const FlightDetails = ({
             </Button>
           {!readOnly && (
             <Button variant="destructive" onClick={handleDeleteFlight}>
-                <TrashIcon className="h-4 w-4 mr-1" />
-                {t('flights.delete')}
-              </Button>
+              <TrashIcon className="h-4 w-4 mr-1" />
+              {t('flights.delete')}
+            </Button>
           )}
           </div>
         </div>
