@@ -37,6 +37,7 @@ function HomePage() {
   const [activeTab, setActiveTab] = useState<string>("map");
   const [rightPanelTab, setRightPanelTab] = useState<string>("airfields");
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [heatmapStateBeforeSelection, setHeatmapStateBeforeSelection] = useState<boolean | null>(null);
   const { t } = useTranslation();
   
   // Show onboarding on mount if needed
@@ -55,15 +56,35 @@ function HomePage() {
     setSelectedFlightPath(null);
   };
   
-  const handleFlightSelect = (flight: FlightPath) => {
-    setSelectedFlightPath(flight);
-    setSelectedAirfield(null);
+  const handleFlightSelect = (flight: FlightPath | null) => {
+    const { map: mapPreferences, updateMapPreferences } = usePreferencesStore.getState();
     
-    if (isMobile) {
-      setActiveTab("map");
+    if (flight) {
+      // Store current heatmap state before selecting flight
+      setHeatmapStateBeforeSelection(mapPreferences.showHeatmap);
+      
+      // Turn off heatmap when selecting a flight
+      if (mapPreferences.showHeatmap) {
+        updateMapPreferences({ showHeatmap: false });
+      }
+      
+      setSelectedFlightPath(flight);
+      setSelectedAirfield(null);
+      
+      if (isMobile) {
+        setActiveTab("map");
+      } else {
+        // Switch to flights tab in the right panel on desktop
+        setRightPanelTab("flights");
+      }
     } else {
-      // Switch to flights tab in the right panel on desktop
-      setRightPanelTab("flights");
+      // Restore heatmap state when deselecting flight
+      if (heatmapStateBeforeSelection !== null && heatmapStateBeforeSelection !== mapPreferences.showHeatmap) {
+        updateMapPreferences({ showHeatmap: heatmapStateBeforeSelection });
+      }
+      
+      setSelectedFlightPath(null);
+      setHeatmapStateBeforeSelection(null);
     }
   };
   
@@ -151,7 +172,7 @@ function HomePage() {
               {selectedFlightPath && (
                 <FlightDetails 
                   flight={selectedFlightPath} 
-                  onClose={() => setSelectedFlightPath(null)} 
+                  onClose={() => handleFlightSelect(null)} 
                   isSheet={true} 
                 />
               )}
@@ -243,7 +264,7 @@ function HomePage() {
                 {selectedFlightPath ? (
                   <FlightDetails
                     flight={selectedFlightPath}
-                    onClose={() => setSelectedFlightPath(null)}
+                    onClose={() => handleFlightSelect(null)}
                     className="h-full"
                   />
                 ) : (

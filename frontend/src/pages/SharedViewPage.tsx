@@ -15,6 +15,7 @@ import { ShareableData } from '@/types/share';
 import { getShare } from '@/services/shareService';
 import { decryptData, isValidEncryptionKey } from '@/lib/encryption';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { usePreferencesStore } from '@/store/preferences-store';
 
 const SharedViewPage = () => {
   const { shareId } = useParams<{ shareId: string }>();
@@ -29,6 +30,7 @@ const SharedViewPage = () => {
   const [selectedAirfield, setSelectedAirfield] = useState<Airfield | null>(null);
   const [selectedFlightPath, setSelectedFlightPath] = useState<FlightPath | null>(null);
   const [activeTab, setActiveTab] = useState<string>("map");
+  const [heatmapStateBeforeSelection, setHeatmapStateBeforeSelection] = useState<boolean | null>(null);
 
   useEffect(() => {
     const loadSharedData = async () => {
@@ -71,12 +73,32 @@ const SharedViewPage = () => {
     setSelectedFlightPath(null);
   };
   
-  const handleFlightSelect = (flight: FlightPath) => {
-    setSelectedFlightPath(flight);
-    setSelectedAirfield(null);
+  const handleFlightSelect = (flight: FlightPath | null) => {
+    const { map: mapPreferences, updateMapPreferences } = usePreferencesStore.getState();
     
-    if (isMobile) {
-      setActiveTab("map");
+    if (flight) {
+      // Store current heatmap state before selecting flight
+      setHeatmapStateBeforeSelection(mapPreferences.showHeatmap);
+      
+      // Turn off heatmap when selecting a flight
+      if (mapPreferences.showHeatmap) {
+        updateMapPreferences({ showHeatmap: false });
+      }
+      
+      setSelectedFlightPath(flight);
+      setSelectedAirfield(null);
+      
+      if (isMobile) {
+        setActiveTab("map");
+      }
+    } else {
+      // Restore heatmap state when deselecting flight
+      if (heatmapStateBeforeSelection !== null && heatmapStateBeforeSelection !== mapPreferences.showHeatmap) {
+        updateMapPreferences({ showHeatmap: heatmapStateBeforeSelection });
+      }
+      
+      setSelectedFlightPath(null);
+      setHeatmapStateBeforeSelection(null);
     }
   };
 
@@ -168,7 +190,7 @@ const SharedViewPage = () => {
               {selectedFlightPath && (
                 <FlightDetails 
                   flight={selectedFlightPath} 
-                  onClose={() => setSelectedFlightPath(null)} 
+                  onClose={() => handleFlightSelect(null)} 
                   isSheet={true}
                   readOnly
                 />
@@ -265,7 +287,7 @@ const SharedViewPage = () => {
                 {selectedFlightPath ? (
                   <FlightDetails
                     flight={selectedFlightPath}
-                    onClose={() => setSelectedFlightPath(null)}
+                    onClose={() => handleFlightSelect(null)}
                     className="h-full"
                     readOnly
                   />
